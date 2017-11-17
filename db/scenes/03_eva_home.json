@@ -1,0 +1,22 @@
+{
+  "id": "03_eva_home",
+  "states": {
+    "0": {
+      "messages": [
+        {
+          "text": "Игра в разработке!",
+          "options": {
+            "reply_markup": {
+              "remove_keyboard": true
+            }
+          }
+        }
+      ],
+      "answers": {
+        "*": {
+          "state": 0
+        }
+      }
+    }
+  }
+}

@@ -1,9 +1,6 @@
 {
   "db": {
     "database": "mongodb",
-    "filedb": {
-      "path": "./db"
-    },
     "mongodb": {
       "host": "localhost",
       "port": 27017,

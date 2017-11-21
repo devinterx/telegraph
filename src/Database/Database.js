@@ -1,13 +1,9 @@
 import MongoDB from 'mongodb'
 
-import fs from 'fs';
-import path from 'path';
-
 const MongoClient = MongoDB.MongoClient;
 const ObjectID = MongoDB.ObjectID;
 
 export default class Database {
-    static FILE_DB = 'filedb';
     static MONGO_DB = 'mongodb';
 
     static db;
@@ -16,10 +12,8 @@ export default class Database {
         if (Database.db === undefined) {
             if (config.database === Database.MONGO_DB) {
                 Database.db = new MongoDatabase(config.mongodb, callback);
-            } else if (config.database === Database.FILE_DB) {
-                Database.db = new FileDatabase(config.filedb, callback);
             } else {
-                Database.db = new FileDatabase(config.filedb, callback);
+                throw Error('Support only mongodb database.')
             }
         }
         return Database.db;
@@ -153,118 +147,5 @@ class MongoDatabase {
         let result = Object.assign({}, item);
         delete result._id;
         return result;
-    }
-}
-
-class FileDatabase {
-    _path;
-
-    constructor(config, callback) {
-        this._path = path.resolve(config.path);
-
-        if (!fs.existsSync(this._path)
-            || (!fs.lstatSync(this._path).isDirectory() && fs.accessSync(this._path, fs.W_OK))
-        ) {
-            if (fs.existsSync(this._path) && !fs.accessSync(this._path, fs.W_OK)) {
-                console.error('DB: is not writable!');
-            }
-            fs.mkdirSync(this._path, 0o777);
-        }
-        callback();
-    }
-
-    count(index, callback, limit, offset) {
-
-    }
-
-    list(index, callback, limit, offset) {
-
-    }
-
-    load(index, defaultData, callback) {
-        const file = `${this._path}/${index}.json`;
-
-        fs.lstat(file, (error, stats) => {
-            if (error) {
-                if (error.code === 'ENOENT') {
-                    console.log(`DB: index "${index}" not exist. Trying create...`);
-                    let result = Database.save(index, defaultData, callback);
-                    console.log(`DB: index "${index}" created.`);
-                    return result;
-                } else return console.log(`DB: index "${index}" not readable.`);
-            }
-            fs.access(file, fs.R_OK, error => {
-                if (error) return console.log(`DB: index "${index}" not readable.`);
-
-                if (stats.isFile()) {
-                    fs.readFile(file, 'utf8', (err, contents) => {
-                        callback(JSON.parse(contents));
-                    });
-                } else {
-                    console.warn(`DB: index "${index}" not readable or it's directory.`);
-                }
-            }, () => {
-                console.log(`DB: index "${index}" not readable.`);
-            });
-        }, () => {
-            console.log(`DB: index "${index}" not readable.`);
-        });
-    }
-
-    save(index, data, callback) {
-        const file = `${this._path}/${index}.json`;
-        const _index = path.dirname(file);
-        this._checkIndex(_index);
-
-        fs.lstat(_index, (error, stats) => {
-            if (error) return console.log(`DB: index "${index}" not readable.`);
-
-            fs.access(_index, fs.W_OK, error => {
-                if (error) return console.log(`DB: index "${index}" not readable.`);
-
-                if (stats.isDirectory()) {
-                    fs.writeFile(file, JSON.stringify(data), 'utf8', () => {
-                        callback(data);
-                    });
-                } else {
-                    console.warn(`DB: index "${index}" not writable or it's directory.`);
-                }
-            }, () => {
-                console.log(`DB: index "${index}" not readable.`);
-            });
-        }, () => {
-            console.log(`DB: index "${index}" not readable.`);
-        });
-
-    }
-
-    remove(index, callback) {
-        const file = `${this._path}/${index}.json`;
-
-        fs.lstat(file, (error, stats) => {
-            if (error) return console.log(`DB: index "${index}" not writable.`);
-
-            fs.access(file, fs.W_OK, error => {
-                if (error) return console.log(`DB: index "${index}" not writable.`);
-
-                if (stats.isFile()) {
-                    fs.unlink(file, () => {
-                        callback(data);
-                    });
-                } else {
-                    console.warn(`DB: index "${index}" not writable or it's directory.`);
-                }
-            }, () => {
-                console.log(`DB: index "${index}" not writable.`);
-            });
-        }, () => {
-            console.log(`DB: index "${index}" not writable.`);
-        });
-    }
-
-    _checkIndex(index) {
-        let dirname = path.dirname(index);
-        if (!fs.existsSync(dirname)) this._checkIndex(dirname);
-        if (!fs.existsSync(index)) fs.mkdirSync(index, 0o777);
     }
 }

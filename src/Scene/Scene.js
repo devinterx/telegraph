@@ -10,7 +10,7 @@ export default class Scene {
     static _scenes = [];
 
     /**
-     * @param {{id:int, states:SceneData|object}} scene
+     * @param {{id:int, states:object}} scene
      */
     constructor(scene) {
         this.id = scene.id;
@@ -25,7 +25,9 @@ export default class Scene {
         if (typeof scene === 'string') scene = {id: scene};
 
         if (Scene._scenes[scene.id] === undefined) {
-            Database.load(`scenes/${scene.id}`, {}, scene => {
+            let data = Object.assign({}, DEFAULT_SCENE);
+            data.id = scene.id;
+            Database.load(`scenes/${scene.id}`, data, scene => {
                 Scene._scenes[scene.id] = new Scene(scene);
                 Scene._scenes[scene.id]._lastUpdateTime = Date.now();
                 callback(Scene._scenes[scene.id]);
@@ -52,6 +54,24 @@ export default class Scene {
     }
 }
 
-class SceneData {
-
-}
+const DEFAULT_SCENE = {
+    states: {
+        0: {
+            messages: [
+                {
+                    text: 'Game in development',
+                    options: {
+                        reply_markup: {
+                            remove_keyboard: true
+                        }
+                    }
+                }
+            ],
+            answers: {
+                "*": {
+                    state: 0
+                }
+            }
+        }
+    }
+};

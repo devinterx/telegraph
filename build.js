@@ -3,7 +3,7 @@ const ProgressPlugin = require('webpack/lib/ProgressPlugin');
 const config = require('./webpack.config');
 const compiler = webpack(config);
 
-compiler.apply(new ProgressPlugin(function (percentage, msg, current, active, modulePath) {
+compiler.apply(new ProgressPlugin((percentage, msg, current, active, modulePath) => {
     if (process.stdout.isTTY && percentage < 1) {
         process.stdout.cursorTo(0);
         modulePath = modulePath ? ' …' + modulePath.substr(modulePath.length - 30) : '';

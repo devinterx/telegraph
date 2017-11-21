@@ -1,5 +1,5 @@
 {
-  "id": "01_hello",
+  "id": "00_init_scene",
   "states": {
     "0": {
       "messages": [

@@ -1,32 +1,39 @@
-// require('babel-register'); // TODO:: delete this, in production by webpack(delete .map instead)
-import TelegramBot from 'node-telegram-bot-api'
-import Express from 'express'
+import TelegramBot from "node-telegram-bot-api"
+import Express from "express"
+import React from "react"
 import Database from "./Database/Database"
 import User from "./User/User"
 import Scene from "./Scene/Scene"
 import WebServer from "./Web/WebServer"
-import React from "react";
+
+import fs from "fs"
+import path from "path"
+
+require('babel-register');
 
 const TOKEN = '';
+const CONFIG_FILE = "./config.json";
 
 class VictorianoBot {
     _bot;
     _server;
 
-    constructor(token, options) {
-        this._bot = new TelegramBot(token, options.bot);
-        this._server = Express();
-        Database.init();
-        WebServer.init(this._server, Express);
-        User.addResponseChannel(this._bot);
-        this._listen(options);
+    constructor(token, config) {
+        if (config.services.bot) this._bot = new TelegramBot(token, config.bot);
+        if (config.services.web) this._server = Express();
+
+        Database.init(config.db, () => {
+            if (this._server) WebServer.init(this._server, Express);
+            if (this._bot) User.addResponseChannel(this._bot);
+            this._listen(config);
+        });
     }
 
     _listen = options => {
-        this._bot.on('message', this.onMessage);
-        this._bot.on('polling_error', this.onError);
+        if (this._bot) this._bot.on('message', this.onMessage);
+        if (this._bot) this._bot.on('polling_error', this.onError);
 
-        this._server.listen(
+        if (this._server) this._server.listen(
             options && options.web ? options.web.port || 8080 : 8080,
             options && options.ip ? options.web.ip || '0.0.0.0' : '0.0.0.0',
             this.onError);
@@ -61,4 +68,19 @@ class VictorianoBot {
     };
 }
 
-new VictorianoBot(process.env.BOT_TOKEN || TOKEN, {web: {ip: '127.0.0.1', port: 8080}, bot: {polling: true}});
+class Victoriano {
+    constructor(token) {
+        const file = path.resolve(CONFIG_FILE);
+
+        fs.access(file, fs.R_OK, error => {
+            if (error) return console.log(`Victoriano: config file "${CONFIG_FILE}" not found.`);
+
+            fs.readFile(file, 'utf8', (error, config) => {
+                if (error) throw Error('Victoriano: error read config.');
+                new VictorianoBot(token, JSON.parse(config));
+            });
+        });
+    }
+}
+
+new Victoriano(process.env.BOT_TOKEN || TOKEN);

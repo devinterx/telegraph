@@ -1,6 +1,7 @@
 const webpack = require('webpack');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 const NodeExternals = require('webpack-node-externals');
 const path = require('path');
 
@@ -75,7 +76,14 @@ const backend = {
                 comments: false
             },
             sourceMap: true
-        })
+        }),
+        new CopyWebpackPlugin([
+            {from: 'src/config.json'},
+            // {
+            //     from: 'db',
+            //     to: path.resolve('./build/db/')
+            // },
+        ])
     ]
 };
 
@@ -114,6 +122,9 @@ const frontend = {
             inject: true,
             hash: true
         }),
+        new CopyWebpackPlugin([
+            {from: 'src/favicon.ico'},
+        ])
     ]
 };
 

@@ -18,7 +18,7 @@ export default class User {
      * @param {{id:int, first_name:string, last_name:string, user_name:string, data:UserData|object}} user
      */
     constructor(user) {
-        this.id = user.id;
+        this.id = parseInt(user.id);
         this.firstName = user.first_name;
         this.lastName = user.last_name;
         this.userName = user.user_name;
@@ -101,6 +101,8 @@ export default class User {
     }
 
     static loadUser(user, callback) {
+        user = Object.assign({}, user);
+        if (typeof user.id === 'number') user.id = user.id.toString();
         if (User._users[user.id] === undefined) {
             Database.load(`users/${user.id}`, Object.assign({}, user, {data: new UserData()}), user => {
                 User._users[user.id] = new User(user);
@@ -114,6 +116,8 @@ export default class User {
     }
 
     static unloadUser(user) {
+        user = Object.assign({}, user);
+        if (typeof user.id === 'number') user.id = user.id.toString();
         Database.save(`users/${user.id}`, Object.assign({}, user), user => {
             delete User._users[user.id];
         });
@@ -132,7 +136,7 @@ export default class User {
 }
 
 class UserData {
-    scene = '01_hello';
+    scene = '00_init_scene';
     state = 0;
     item = false;
     inventory = false;

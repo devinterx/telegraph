@@ -6,6 +6,7 @@ const ObjectID = MongoDB.ObjectID;
 export default class Database {
     static MONGO_DB = 'mongodb';
 
+    /** @type {MongoDatabase} */
     static db;
 
     static init(config, callback) {
@@ -94,7 +95,7 @@ class MongoDatabase {
         const params = index.split('/');
 
         this._db.collection(params[0]).findOne({id: params[1]}).then(item => {
-            if (item === null) {
+            if (item === null && typeof defaultData === 'object' && defaultData !== null) {
                 console.log(`DB: index "${index}" not exist. Trying create...`);
                 this.save(index, defaultData, callback);
                 console.log(`DB: index "${index}" created.`);
@@ -109,23 +110,26 @@ class MongoDatabase {
     save(index, data, callback) {
         const params = index.split('/');
 
-        this._db.collection(params[0]).findOne({id: params[1]}).then(item => {
-            if (item === null) {
-                this._db.collection(params[0]).insertOne(data).then(item => {
-                    callback(MongoDatabase._itemToResult(item.ops[0]));
-                }).catch(error => {
-                    console.log(`DB: error:`, error);
-                });
-            } else {
-                this._db.collection(params[0]).updateOne({_id: new ObjectID(item._id)}, data).then(item => {
-                    callback(MongoDatabase._itemToResult(item));
-                }).catch(error => {
-                    console.log(`DB: error:`, error);
-                });
-            }
-        }).catch(error => {
-            console.log(`DB: error:`, error);
-        });
+        if (typeof data === 'object' && data !== null) {
+            this._db.collection(params[0]).findOne({id: params[1]}).then(item => {
+                if (item === null) {
+                    this._db.collection(params[0]).insertOne(data).then(item => {
+                        callback(MongoDatabase._itemToResult(item.ops[0]));
+                    }).catch(error => {
+                        console.log(`DB: error:`, error);
+                    });
+                } else {
+                    this._db.collection(params[0]).updateOne({_id: new ObjectID(item._id)}, data).then(item => {
+                        callback(MongoDatabase._itemToResult(item));
+                    }).catch(error => {
+                        console.log(`DB: error:`, error);
+                    });
+                }
+            }).catch(error => {
+                console.log(`DB: error:`, error);
+            });
+        }
+        console.log(`DB: error saving index "${index}", DATA is not object.`);
     }
 
     remove(index, callback) {

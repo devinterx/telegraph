@@ -21,6 +21,7 @@
     "babel-preset-react": "^6.24.1",
     "babel-preset-stage-0": "^6.24.1",
     "babel-register": "^6.26.0",
+    "cookie-parser": "^1.4.3",
     "copy-webpack-plugin": "^4.2.1",
     "css-loader": "^0.28.7",
     "express": "^4.16.2",

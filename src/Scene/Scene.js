@@ -17,6 +17,60 @@ export default class Scene {
         this.states = scene.states;
     }
 
+    /**
+     * @param {User} user
+     * @param {string} message
+     */
+    processSceneMessages = (user, message) => {
+        let answers = this.getState(user.data.state)['answers'];
+        let trigger = false;
+        if (answers[message] !== undefined) {
+            if (answers[message].scene !== undefined && user.data.scene !== answers[message].scene) {
+                user.data.scene = answers[message].scene;
+                trigger = true;
+            }
+            if (answers[message].state !== undefined && user.data.state !== answers[message].state) {
+                user.data.state = answers[message].state;
+                trigger = true;
+            }
+        } else if (answers['*'] !== undefined) { // любое сообщение
+            if (answers['*'].scene !== undefined && user.data.scene !== answers['*'].scene) {
+                user.data.scene = answers['*'].scene;
+                trigger = true;
+            }
+            if (answers['*'].state !== undefined && user.data.state !== answers['*'].state) {
+                user.data.state = answers['*'].state;
+                trigger = true;
+            }
+        }
+
+        if (trigger) {
+            user.saveUser(user => {
+                this.processMessages(user);
+            });
+        } else if (answers['*'] !== undefined) {
+            this.processMessages(user);
+        }
+    };
+
+    /**
+     * @param {User} user
+     * @private
+     */
+    processMessages = user => {
+        user.loadUserSceneStage(user.data.scene, user.data.state, messages => {
+            for (let i = 0; i < messages.length; i++) {
+                setTimeout(() => {
+                    user.sendMessage(messages[i].text, messages[i].options);
+                }, 200 * i);
+            }
+        });
+    };
+
+    /**
+     * @param {string} state
+     * @return {*}
+     */
     getState = state => {
         return this.states[state];
     };

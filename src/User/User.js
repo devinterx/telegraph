@@ -26,58 +26,24 @@ export default class User {
     }
 
     onJoin = () => {
-        this._processSceneMessages(this.data.scene, this.data.state);
+        Scene.loadScene(this.data.scene, scene => {
+            scene.processMessages(this);
+        });
     };
 
-    _loadUserSceneStage(scene, state, callback) {
+    onMessage = message => {
+        
+
+        Scene.loadScene(this.data.scene, scene => {
+            scene.processSceneMessages(this, message);
+        });
+    };
+
+    loadUserSceneStage(scene, state, callback) {
         Scene.loadScene(scene, scene => {
             callback(scene.getState(state).messages);
         });
     }
-
-    onMessage = message => {
-        Scene.loadScene(this.data.scene, scene => {
-            let answers = scene.getState(this.data.state)['answers'];
-            let trigger = false;
-            if (answers[message] !== undefined) {
-                if (answers[message].scene !== undefined && this.data.scene !== answers[message].scene) {
-                    this.data.scene = answers[message].scene;
-                    trigger = true;
-                }
-                if (answers[message].state !== undefined && this.data.state !== answers[message].state) {
-                    this.data.state = answers[message].state;
-                    trigger = true;
-                }
-            } else if (answers['*'] !== undefined) { // любое сообщение
-                if (answers['*'].scene !== undefined && this.data.scene !== answers['*'].scene) {
-                    this.data.scene = answers['*'].scene;
-                    trigger = true;
-                }
-                if (answers['*'].state !== undefined && this.data.state !== answers['*'].state) {
-                    this.data.state = answers['*'].state;
-                    trigger = true;
-                }
-            }
-
-            if (trigger) {
-                this.saveUser(user => {
-                    this._processSceneMessages(user.data.scene, user.data.state);
-                });
-            } else if (answers['*'] !== undefined) {
-                this._processSceneMessages(this.data.scene, this.data.state);
-            }
-        });
-    };
-
-    _processSceneMessages = (scene, state) => {
-        this._loadUserSceneStage(scene, state, messages => {
-            for (let i = 0; i < messages.length; i++) {
-                setTimeout(() => {
-                    this.sendMessage(messages[i].text, messages[i].options);
-                }, 200 * i);
-            }
-        });
-    };
 
     sendMessage = (message, options) => {
         message = message.replace('%ufn', this.firstName);

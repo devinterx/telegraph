@@ -15,3 +15,16 @@ export const session = (request, response, next) => {
         }
     } else next();
 };
+
+export default class Auth {
+    static listWebSession(user) {
+        Database.find('sessions', {userId: user.id}, sessions => {
+            console.log('sessions: ', sessions);
+            if (sessions === null) {
+
+            } else {
+
+            }
+        });
+    }
+}

@@ -1,8 +1,8 @@
-import Database from "../Database/Database"
-import {session} from "../Auth/Auth"
-
 import cookieParser from "cookie-parser";
 import path from "path";
+
+import Database from "../Database/Database"
+import {session} from "../Auth/Auth"
 
 export default class WebServer {
     static init(server, express) {

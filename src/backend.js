@@ -49,8 +49,8 @@ class VictorianoBot {
         if (context.from['is_bot'] === true) return;
 
         User.loadUser(context.from, user => {
-            if (context.text === '/start') {
-                user.onJoin();
+            if (context.text.startsWith('/')) {
+                user.onCommand(context.text)
             } else {
                 user.onMessage(context.text.toString());
             }

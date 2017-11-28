@@ -28,6 +28,10 @@ export default class Database {
         Database.db.list(index, callback, limit, offset);
     }
 
+    static find(collection, query, callback, limit, offset) {
+        Database.db.find(collection, query, callback, limit, offset);
+    }
+
     static load(index, defaultData, callback) {
         Database.db.load(index, defaultData, callback);
     }
@@ -88,6 +92,31 @@ class MongoDatabase {
                 items.push(MongoDatabase._itemToResult(results[i]));
             }
             callback(items)
+        });
+    }
+
+    find(collection, query, callback, limit, offset) {
+        let cursor;
+        if (limit !== undefined && offset !== undefined) {
+            cursor = this._db.collection(collection).find(query).skip(offset).limit(limit);
+        } else if (limit !== undefined) {
+            cursor = this._db.collection(collection).find(query).limit(limit);
+        } else cursor = this._db.collection(collection).find(query);
+
+        cursor.count().then(count => {
+            if (count < 1) {
+                callback(null);
+            } else {
+                cursor.toArray((error, results) => {
+                    if (error) return console.log(error);
+
+                    let items = [];
+                    for (let i = 0; i < results.length; i++) {
+                        items.push(MongoDatabase._itemToResult(results[i]));
+                    }
+                    callback(items)
+                });
+            }
         });
     }
 

@@ -1,4 +1,5 @@
 import Database from "../Database/Database"
+import Command from "../Command/Command"
 import Scene from "../Scene/Scene"
 
 export default class User {
@@ -31,9 +32,13 @@ export default class User {
         });
     };
 
-    onMessage = message => {
-        
+    onCommand = message => {
+        if (message === '/start') return this.onJoin();
 
+        Command.onCommand(message.substring(1), this);
+    };
+
+    onMessage = message => {
         Scene.loadScene(this.data.scene, scene => {
             scene.processSceneMessages(this, message);
         });
@@ -49,7 +54,7 @@ export default class User {
         message = message.replace('%ufn', this.firstName);
         message = message.replace('%uln', this.lastName);
 
-        User._channel.sendMessage(this.id, message, options).catch(error => this.onError);
+        User._channel.sendMessage(this.id, message, options).catch(this.onError);
     };
 
     onError = error => {

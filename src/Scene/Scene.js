@@ -81,11 +81,11 @@ export default class Scene {
         if (Scene._scenes[scene.id] === undefined) {
             let data = Object.assign({}, DEFAULT_SCENE);
             data.id = scene.id;
-            Database.load(`scenes/${scene.id}`, data, scene => {
+            Database.load('scenes', {id: scene.id}, scene => {
                 Scene._scenes[scene.id] = new Scene(scene);
                 Scene._scenes[scene.id]._lastUpdateTime = Date.now();
                 callback(Scene._scenes[scene.id]);
-            });
+            }, data);
         } else {
             Scene._scenes[scene.id]._lastUpdateTime = Date.now();
             callback(Scene._scenes[scene.id]);

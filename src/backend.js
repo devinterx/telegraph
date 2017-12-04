@@ -31,6 +31,7 @@ class VictorianoBot {
 
     _listen = options => {
         if (this._bot) this._bot.on('message', this.onMessage);
+        if (this._bot) this._bot.on('callback_query', this.onCallbackQuery);
         if (this._bot) this._bot.on('polling_error', this.onError);
 
         if (this._server) this._server.listen(
@@ -50,10 +51,18 @@ class VictorianoBot {
 
         User.loadUser(context.from, user => {
             if (context.text.startsWith('/')) {
-                user.onCommand(context.text)
+                user.onCommand(context.text);
             } else {
                 user.onMessage(context.text.toString());
             }
+        });
+    };
+
+    onCallbackQuery = context => {
+        if (context.from['is_bot'] === true) return;
+
+        User.loadUser(context.from, user => {
+            user.onCommandCallback(context.data.toString(), context);
         });
     };
 
@@ -68,7 +77,13 @@ class VictorianoBot {
     };
 }
 
-class Victoriano {
+export class Victoriano {
+    static CONFIG;
+
+    static get WebHost() {
+        return Victoriano.CONFIG['web']['host'];
+    }
+
     constructor(token) {
         const file = path.resolve(CONFIG_FILE);
 
@@ -77,7 +92,8 @@ class Victoriano {
 
             fs.readFile(file, 'utf8', (error, config) => {
                 if (error) throw Error('Victoriano: error read config.');
-                new VictorianoBot(token, JSON.parse(config));
+                Victoriano.CONFIG = JSON.parse(config);
+                new VictorianoBot(token, Victoriano.CONFIG);
             });
         });
     }

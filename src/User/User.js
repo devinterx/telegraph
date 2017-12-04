@@ -1,6 +1,7 @@
 import Database from "../Database/Database"
 import Command from "../Command/Command"
 import Scene from "../Scene/Scene"
+import {PERMISSION} from "../Auth/Auth";
 
 export default class User {
     id;
@@ -32,9 +33,8 @@ export default class User {
         });
     };
 
-    onCommand = message => {
+    onCommand = (message) => {
         if (message === '/start') return this.onJoin();
-
         Command.onCommand(message.substring(1), this);
     };
 
@@ -44,25 +44,35 @@ export default class User {
         });
     };
 
+    onCommandCallback = (data, context) => {
+        Command.onCommandCallback(data, this, context);
+    };
+
     loadUserSceneStage(scene, state, callback) {
         Scene.loadScene(scene, scene => {
             callback(scene.getState(state).messages);
         });
     }
 
-    sendMessage = (message, options) => {
+    sendMessage = (message, options, callback) => {
         message = message.replace('%ufn', this.firstName);
         message = message.replace('%uln', this.lastName);
 
-        User._channel.sendMessage(this.id, message, options).catch(this.onError);
+        User._channel.sendMessage(this.id, message, options).then(context => {
+            if (callback && typeof callback === 'function') callback(this, context);
+        }).catch(this.onError);
+    };
+
+    removeMessage = (messageId, chatId) => {
+        User._channel.deleteMessage(chatId || this.id, messageId).catch(this.onError);
     };
 
     onError = error => {
         console.log(error);
     };
 
-    saveUser = (callback) => {
-        Database.save(`users/${this.id}`, Object.assign({}, User._users[this.id]), user => {
+    saveUser = callback => {
+        Database.save('users', {id: this.id}, Object.assign({}, User._users[this.id]), user => {
             callback(user);
         });
     };
@@ -71,15 +81,24 @@ export default class User {
         User._channel = channel;
     }
 
+    /**
+     * @callback loadUserCallback
+     * @param {User} user
+     */
+
+    /**
+     * @param {{id: string}} user
+     * @param {loadUserCallback} callback
+     */
     static loadUser(user, callback) {
         user = Object.assign({}, user);
         if (typeof user.id === 'number') user.id = user.id.toString();
         if (User._users[user.id] === undefined) {
-            Database.load(`users/${user.id}`, Object.assign({}, user, {data: new UserData()}), user => {
+            Database.load('users', {id: user.id}, user => {
                 User._users[user.id] = new User(user);
                 User._users[user.id]._lastUpdateTime = Date.now();
                 callback(User._users[user.id]);
-            });
+            }, Object.assign({}, user, {data: new UserData()}));
         } else {
             User._users[user.id]._lastUpdateTime = Date.now();
             callback(User._users[user.id]);
@@ -89,7 +108,7 @@ export default class User {
     static unloadUser(user) {
         user = Object.assign({}, user);
         if (typeof user.id === 'number') user.id = user.id.toString();
-        Database.save(`users/${user.id}`, Object.assign({}, user), user => {
+        Database.save('users', {id: user.id}, Object.assign({}, user), user => {
             delete User._users[user.id];
         });
     }
@@ -107,6 +126,7 @@ export default class User {
 }
 
 class UserData {
+    permission = PERMISSION.USER;
     scene = '00_init_scene';
     state = 0;
     item = false;

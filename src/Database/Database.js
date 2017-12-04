@@ -20,28 +20,32 @@ export default class Database {
         return Database.db;
     }
 
-    static count(index, callback, limit, offset) {
-        Database.db.count(index, callback, limit, offset);
+    static count(collection, query, callback, limit, offset) {
+        Database.db.count(collection, query, callback, limit, offset);
     }
 
-    static list(index, callback, limit, offset) {
-        Database.db.list(index, callback, limit, offset);
+    static list(collection, query, callback, limit, offset) {
+        Database.db.list(collection, query, callback, limit, offset);
     }
 
     static find(collection, query, callback, limit, offset) {
         Database.db.find(collection, query, callback, limit, offset);
     }
 
-    static load(index, defaultData, callback) {
-        Database.db.load(index, defaultData, callback);
+    static load(collection, query, callback, defaultData) {
+        Database.db.load(collection, query, callback, defaultData);
     }
 
-    static save(index, data, callback) {
-        Database.db.save(index, data, callback);
+    static save(collection, query, data, callback) {
+        Database.db.save(collection, query, data, callback);
     }
 
-    static remove(index, callback) {
-        Database.db.remove(index, callback);
+    static remove(collection, query, callback) {
+        Database.db.remove(collection, query, callback);
+    }
+
+    static removeAll(collection, query, callback) {
+        Database.db.removeAll(collection, query, callback);
     }
 }
 
@@ -63,26 +67,26 @@ class MongoDatabase {
         });
     }
 
-    count(index, callback, limit, offset) {
+    count(collection, query, callback, limit, offset) {
         let cursor;
         if (limit !== undefined && offset !== undefined) {
-            cursor = this._db.collection(index).find().skip(offset).limit(limit);
+            cursor = this._db.collection(collection).find(query).skip(offset).limit(limit);
         } else if (limit !== undefined) {
-            cursor = this._db.collection(index).find().limit(limit);
-        } else cursor = this._db.collection(index).find();
+            cursor = this._db.collection(collection).find(query).limit(limit);
+        } else cursor = this._db.collection(collection).find(query);
 
         cursor.count().then(count => {
             callback(count);
         });
     }
 
-    list(index, callback, limit, offset) {
+    list(collection, query, callback, limit, offset) {
         let cursor;
         if (limit !== undefined && offset !== undefined) {
-            cursor = this._db.collection(index).find().skip(offset).limit(limit);
+            cursor = this._db.collection(collection).find(query).skip(offset).limit(limit);
         } else if (limit !== undefined) {
-            cursor = this._db.collection(index).find().limit(limit);
-        } else cursor = this._db.collection(index).find();
+            cursor = this._db.collection(collection).find(query).limit(limit);
+        } else cursor = this._db.collection(collection).find(query);
 
         cursor.toArray((error, results) => {
             if (error) return console.log(error);
@@ -120,10 +124,8 @@ class MongoDatabase {
         });
     }
 
-    load(index, defaultData, callback) {
-        const params = index.split('/');
-
-        this._db.collection(params[0]).findOne({id: params[1]}).then(item => {
+    load(collection, query, callback, defaultData) {
+        this._db.collection(collection).findOne(query).then(item => {
             if (item === null && typeof defaultData === 'object' && defaultData !== null) {
                 console.log(`DB: index "${index}" not exist. Trying create...`);
                 this.save(index, defaultData, callback);
@@ -136,19 +138,17 @@ class MongoDatabase {
         });
     }
 
-    save(index, data, callback) {
-        const params = index.split('/');
-
+    save(collection, query, data, callback) {
         if (typeof data === 'object' && data !== null) {
-            this._db.collection(params[0]).findOne({id: params[1]}).then(item => {
+            this._db.collection(collection).findOne(query).then(item => {
                 if (item === null) {
-                    this._db.collection(params[0]).insertOne(data).then(item => {
+                    this._db.collection(collection).insertOne(data).then(item => {
                         callback(MongoDatabase._itemToResult(item.ops[0]));
                     }).catch(error => {
                         console.log(`DB: error:`, error);
                     });
                 } else {
-                    this._db.collection(params[0]).updateOne({_id: new ObjectID(item._id)}, data).then(item => {
+                    this._db.collection(collection).updateOne({_id: new ObjectID(item._id)}, data).then(item => {
                         callback(MongoDatabase._itemToResult(item));
                     }).catch(error => {
                         console.log(`DB: error:`, error);
@@ -157,20 +157,26 @@ class MongoDatabase {
             }).catch(error => {
                 console.log(`DB: error:`, error);
             });
-        }
-        console.log(`DB: error saving index "${index}", DATA is not object.`);
+        } else console.log(`DB: error saving index "${index}", DATA is not object.`);
     }
 
-    remove(index, callback) {
-        const params = index.split('/');
-        this._db.collection(params[0]).findOne({id: params[1]}).then(item => {
+    remove(collection, query, callback) {
+        this._db.collection(collection).findOne(query).then(item => {
             if (item !== null) {
-                this._db.collection('notes').removeOne({_id: new ObjectID(item._id)}).then(() => {
+                this._db.collection(collection).removeOne({_id: new ObjectID(item._id)}).then(() => {
                     callback();
                 }).catch(error => {
                     console.log(`DB: error:`, error);
                 });
             } else callback();
+        }).catch(error => {
+            console.log(`DB: error:`, error);
+        });
+    }
+
+    removeAll(collection, query, callback) {
+        this._db.collection(collection).removeMany(query).then(() => {
+            callback();
         }).catch(error => {
             console.log(`DB: error:`, error);
         });

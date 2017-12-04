@@ -1,7 +1,7 @@
 import React from "react"
 import ReactDOM from "react-dom"
 import {HashRouter, Route} from "react-router-dom"
-import Router from "./Web/Router/Router";
+import Router from "./frontend/Router/Router";
 
 ReactDOM.render((
     <HashRouter>

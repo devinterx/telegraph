@@ -1,10 +1,11 @@
 import TelegramBot from "node-telegram-bot-api"
 import Express from "express"
 import React from "react"
-import Database from "./Database/Database"
-import User from "./User/User"
-import Scene from "./Scene/Scene"
-import WebServer from "./Web/WebServer"
+
+import Database from "./backend/Database/Database"
+import User from "./backend/User/User"
+import Scene from "./backend/Scene/Scene"
+import WebServer from "./backend/Web/WebServer"
 
 import fs from "fs"
 import path from "path"

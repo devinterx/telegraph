@@ -1,5 +1,5 @@
 import Database from "../Database/Database";
-import {Victoriano} from "../backend";
+import {Victoriano} from "../../backend";
 
 export const PERMISSION = {
     USER: 0,

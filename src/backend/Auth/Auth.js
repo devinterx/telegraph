@@ -1,5 +1,5 @@
 import Database from "../Database/Database";
-import {Victoriano} from "../../backend";
+import {Telegraph} from "../../backend";
 
 export const PERMISSION = {
     USER: 0,
@@ -82,7 +82,7 @@ export default class Auth {
                         permission: user.data.permission || PERMISSION.USER,
                         date: (new Date()).toISOString()
                     }, session => {
-                        user.sendMessage(`New web authorization token: \n ${Victoriano.WebHost}/#/token/${session.token} \n This message will be destroyed in 1 minute.`, {}, (user, context) => {
+                        user.sendMessage(`New web authorization token: \n ${Telegraph.WebHost}/#/token/${session.token} \n This message will be destroyed in 1 minute.`, {}, (user, context) => {
                             const burnMessage = () => {
                                 user.removeMessage(context.message_id);
                                 clearTimeout(timeout)
@@ -101,7 +101,7 @@ export default class Auth {
                                 permission: user.data.permission || PERMISSION.USER,
                                 date: (new Date()).toISOString()
                             }, session => {
-                                user.sendMessage(`Web authorization token: \n ${Victoriano.WebHost}/#/token/${session.token} \n This message will be destroyed in 1 minute.`, {}, (user, context) => {
+                                user.sendMessage(`Web authorization token: \n ${Telegraph.WebHost}/#/token/${session.token} \n This message will be destroyed in 1 minute.`, {}, (user, context) => {
                                     const burnMessage = () => {
                                         user.removeMessage(context.message_id);
                                         clearTimeout(timeout)
@@ -134,7 +134,7 @@ export default class Auth {
                             permission: user.data.permission || PERMISSION.USER,
                             date: (new Date()).toISOString()
                         }, session => {
-                            user.sendMessage(`New web authorization token: \n ${Victoriano.WebHost}/#/token/${session.token} \n This message will be destroyed in 1 minute.`, {}, (user, context) => {
+                            user.sendMessage(`New web authorization token: \n ${Telegraph.WebHost}/#/token/${session.token} \n This message will be destroyed in 1 minute.`, {}, (user, context) => {
                                 const burnMessage = () => {
                                     user.removeMessage(context.message_id);
                                     clearTimeout(timeout)

@@ -15,7 +15,7 @@ require('babel-register');
 const TOKEN = '';
 const CONFIG_FILE = "./config.json";
 
-class VictorianoBot {
+class TelegraphBot {
     _bot;
     _server;
 
@@ -40,7 +40,7 @@ class VictorianoBot {
             options && options.ip ? options.web.ip || '0.0.0.0' : '0.0.0.0',
             this.onError);
 
-        setInterval(VictorianoBot.gc, 3600000);
+        setInterval(TelegraphBot.gc, 3600000);
 
         console.log(`Victoriano: i'am listen your dreams now. \r\n\tWeb interface: http://127.0.0.1:${
             options && options.web ? options.web.port || 8080 : 8080}.`
@@ -78,11 +78,11 @@ class VictorianoBot {
     };
 }
 
-export class Victoriano {
+export class Telegraph {
     static CONFIG;
 
     static get WebHost() {
-        return Victoriano.CONFIG['web']['host'];
+        return Telegraph.CONFIG['web']['host'];
     }
 
     constructor(token) {
@@ -92,12 +92,12 @@ export class Victoriano {
             if (error) return console.log(`Victoriano: config file "${CONFIG_FILE}" not found.`);
 
             fs.readFile(file, 'utf8', (error, config) => {
-                if (error) throw Error('Victoriano: error read config.');
-                Victoriano.CONFIG = JSON.parse(config);
-                new VictorianoBot(token, Victoriano.CONFIG);
+                if (error) throw Error('Telegraph: error read config.');
+                Telegraph.CONFIG = JSON.parse(config);
+                new TelegraphBot(token, Telegraph.CONFIG);
             });
         });
     }
 }
 
-new Victoriano(process.env.BOT_TOKEN || TOKEN);
+new Telegraph(process.env.BOT_TOKEN || TOKEN);

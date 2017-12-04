@@ -8,10 +8,23 @@ const PageNotFound = ({location}) => (
     </div>
 );
 
+const setToken = token => {
+    let date = new Date();
+    date.setTime(date.getTime() + (5 * 24 * 60 * 60 * 1000));
+
+    document.cookie = `token=${token};expires=${date.toUTCString()};path=/`;
+};
+
 const ApplicationRouter = () => {
     return (
         <Application>
             <Switch>
+                <Route exact path='/token/:token' render={({match}) => {
+                    if (match.params.token !== undefined) {
+                        setToken(match.params.token)
+                    }
+                    return <Redirect to="/"/>
+                }}/>
                 <Route exact path='/' component={Home}/>
 
                 {/* 404 */}

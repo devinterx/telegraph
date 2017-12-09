@@ -1,7 +1,7 @@
 {
   "name": "telegraph",
   "version": "1.0.0",
-  "description": "Telegramm text game bot",
+  "description": "Telegram text game bot",
   "main": "build/game.js",
   "scripts": {
     "build": "node ./build.js"

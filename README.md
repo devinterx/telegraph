@@ -23,7 +23,7 @@ Telegraph Bot - Telegram text game bot
 `npm i --production`
 
 ### ENV
-NTBA_FIX_319=true;BOT_TOKEN=<your-bot-token>
+`NTBA_FIX_319=true;BOT_TOKEN=<your-bot-token>`
 
 ### LICENSE
 The Telegraph Bot is open-sourced software licensed under the MIT license

@@ -9,7 +9,7 @@ const common = {
     module: {
         rules: [
             {
-                test: /\.(js|es6|jsx)$/i,
+                test: /\.(js)$/i,
                 exclude: [/node_modules/],
                 use: [
                     'source-map-loader',
@@ -17,7 +17,30 @@ const common = {
                         loader: 'babel-loader',
                         options: {
                             presets: ['es2015', 'react'],
-                            plugins: ['transform-runtime', ['transform-class-properties', {spec: true}]],
+                            plugins: [
+                                'transform-runtime',
+                                ['transform-class-properties', {spec: true}],
+                                ['transform-builtin-extend', {globals: ['Error', 'Array']}]
+                            ],
+                            cacheDirectory: true
+                        }
+                    }],
+                enforce: 'pre'
+            },
+            {
+                test: /\.(es6|jsx)$/i,
+                exclude: [/node_modules/],
+                use: [
+                    'source-map-loader',
+                    {
+                        loader: 'babel-loader',
+                        options: {
+                            presets: ['es2015', 'react'],
+                            plugins: [
+                                'transform-runtime',
+                                ['transform-class-properties', {spec: true}],
+                                ['transform-builtin-extend', {globals: ['Error', 'Array']}]
+                            ],
                             cacheDirectory: true
                         }
                     }],
@@ -64,7 +87,7 @@ const backend = {
         filename: './server.js'
     },
     externals: [
-        NodeExternals()
+        NodeExternals({whitelist: ['babel-runtime', 'cookie-parser']})
     ],
     plugins: [
         new webpack.NoEmitOnErrorsPlugin(),
@@ -79,6 +102,7 @@ const backend = {
         }),
         new CopyWebpackPlugin([
             {from: 'src/config.json'},
+            {from: './package.json'},
             // {
             //     from: 'db',
             //     to: path.resolve('./build/db/')
@@ -91,7 +115,7 @@ const frontend = {
     cache: false,
     devtool: 'source-map',
     entry: [
-        './src/frontend.js'
+        './src/frontend.jsx'
     ],
     output: {
         path: path.resolve('./build/public'),

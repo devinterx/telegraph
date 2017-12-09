@@ -59,8 +59,8 @@ class MongoDatabase {
         } else {
             url = `mongodb://${config.host}:${config.port}/${config.db}`;
         }
-        MongoClient.connect(url).then(database => {
-            this._db = database;
+        MongoClient.connect(url).then(client => {
+            this._db = client.db(config.db);
             callback();
         }).catch(error => {
             console.log(`DB: error:`, error);

@@ -1,6 +1,5 @@
 import TelegramBot from "node-telegram-bot-api"
 import Express from "express"
-import React from "react"
 
 import Database from "./backend/Database/Database"
 import User from "./backend/User/User"

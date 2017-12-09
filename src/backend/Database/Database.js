@@ -140,20 +140,8 @@ class MongoDatabase {
 
     save(collection, query, data, callback) {
         if (typeof data === 'object' && data !== null) {
-            this._db.collection(collection).findOne(query).then(item => {
-                if (item === null) {
-                    this._db.collection(collection).insertOne(data).then(item => {
-                        callback(MongoDatabase._itemToResult(item.ops[0]), false);
-                    }).catch(error => {
-                        console.log(`DB: error:`, error);
-                    });
-                } else {
-                    this._db.collection(collection).updateOne({_id: new ObjectID(item._id)}, data).then(updateInfo => {
-                        callback(data, updateInfo);
-                    }).catch(error => {
-                        console.log(`DB: error:`, error);
-                    });
-                }
+            this._db.collection(collection).updateOne(query, {$set: data}, {upsert: true}).then(updateInfo => {
+                callback(data, updateInfo);
             }).catch(error => {
                 console.log(`DB: error:`, error);
             });

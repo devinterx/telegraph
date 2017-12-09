@@ -75,41 +75,12 @@ export default class Auth {
         switch (data[0]) {
             case 'login':
                 if (data[1] === undefined || data[1] === 'new') {
-                    const token = (new Token()).toString();
-                    Database.save('sessions', {token}, {
-                        token: token,
-                        userId: user.id,
-                        permission: user.data.permission || PERMISSION.USER,
-                        date: (new Date()).toISOString()
-                    }, session => {
-                        user.sendMessage(`New web authorization token: \n ${Telegraph.WebHost}/#/token/${session.token} \n This message will be destroyed in 1 minute.`, {}, (user, context) => {
-                            const burnMessage = () => {
-                                user.removeMessage(context.message_id);
-                                clearTimeout(timeout)
-                            };
-                            const timeout = setTimeout(burnMessage, 60000);
-                        });
-                        user.removeMessage(context.message.message_id);
-                    });
+                    Auth._authorizeTokenSession((new Token()).toString(), user, context);
                 } else {
                     const token = data[1];
                     Database.count('sessions', {token}, count => {
                         if (count > 0) {
-                            Database.save('sessions', {token}, {
-                                token: token,
-                                userId: user.id,
-                                permission: user.data.permission || PERMISSION.USER,
-                                date: (new Date()).toISOString()
-                            }, session => {
-                                user.sendMessage(`Web authorization token: \n ${Telegraph.WebHost}/#/token/${session.token} \n This message will be destroyed in 1 minute.`, {}, (user, context) => {
-                                    const burnMessage = () => {
-                                        user.removeMessage(context.message_id);
-                                        clearTimeout(timeout)
-                                    };
-                                    const timeout = setTimeout(burnMessage, 60000);
-                                });
-                                user.removeMessage(context.message.message_id);
-                            });
+                            Auth._authorizeTokenSession(token, user, context);
                         } else {
                             user.sendMessage(`Incorrect command query $"auth login ${token}"`);
                             console.log(`Incorrect command query $"auth login ${token}"`);
@@ -127,22 +98,7 @@ export default class Auth {
                     });
                 } else if (data[1] === 'new') {
                     Database.removeAll('sessions', {userId: user.id}, () => {
-                        const token = (new Token()).toString();
-                        Database.save('sessions', {token}, {
-                            token: token,
-                            userId: user.id,
-                            permission: user.data.permission || PERMISSION.USER,
-                            date: (new Date()).toISOString()
-                        }, session => {
-                            user.sendMessage(`New web authorization token: \n ${Telegraph.WebHost}/#/token/${session.token} \n This message will be destroyed in 1 minute.`, {}, (user, context) => {
-                                const burnMessage = () => {
-                                    user.removeMessage(context.message_id);
-                                    clearTimeout(timeout)
-                                };
-                                const timeout = setTimeout(burnMessage, 60000);
-                            });
-                            user.removeMessage(context.message.message_id);
-                        });
+                        Auth._authorizeTokenSession((new Token()).toString(), user, context);
                     });
                 } else if (typeof data[1] === 'string') {
                     Database.remove('sessions', {token: data[1]}, () => {
@@ -162,13 +118,29 @@ export default class Auth {
                 callback();
         }
     }
+
+    static _authorizeTokenSession(token, user, context) {
+        Database.save('sessions', {token}, {
+            token: token,
+            userId: user.id,
+            permission: user.data.permission || PERMISSION.USER,
+            date: (new Date()).toISOString()
+        }, session => {
+            user.sendMessage(`Web authorization token: \n ${Telegraph.WebHost}/#/token/${session.token} \n This message will be destroyed in 1 minute.`, {}, (user, context) => {
+                const burnMessage = () => {
+                    user.removeMessage(context.message_id);
+                    clearTimeout(timeout)
+                };
+                const timeout = setTimeout(burnMessage, 60000);
+            });
+            user.removeMessage(context.message.message_id);
+        });
+    }
 }
 
 class Token {
     token = '';
-
     length = 15;
-
     symbolSet = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j',
         'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F',
         'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
@@ -180,7 +152,5 @@ class Token {
         }
     }
 
-    toString() {
-        return this.token;
-    }
+    toString = () => this.token;
 }

@@ -4,7 +4,7 @@
     "mongodb": {
       "host": "localhost",
       "port": 27017,
-      "db": "victoriano",
+      "db": "telegraph",
       "user": "",
       "password": ""
     }

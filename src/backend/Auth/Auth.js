@@ -126,7 +126,7 @@ export default class Auth {
             permission: user.data.permission || PERMISSION.USER,
             date: (new Date()).toISOString()
         }, session => {
-            user.sendMessage(`Web authorization token: \n ${Telegraph.WebHost}/#/token/${session.token} \n This message will be destroyed in 1 minute.`, {}, (user, context) => {
+            user.sendMessage(`Web authorization token: "${session.token}" \n ${Telegraph.WebHost}/#/token/${session.token} \n This message will be destroyed in 1 minute.`, {}, (user, context) => {
                 const burnMessage = () => {
                     user.removeMessage(context.message_id);
                     clearTimeout(timeout)

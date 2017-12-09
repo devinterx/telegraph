@@ -127,9 +127,9 @@ class MongoDatabase {
     load(collection, query, callback, defaultData) {
         this._db.collection(collection).findOne(query).then(item => {
             if (item === null && typeof defaultData === 'object' && defaultData !== null) {
-                console.log(`DB: index "${index}" not exist. Trying create...`);
-                this.save(index, defaultData, callback);
-                console.log(`DB: index "${index}" created.`);
+                console.log(`DB: record in ${collection} not exist. Trying create...`, query);
+                this.save(collection, query, defaultData, callback);
+                console.log(`DB: record in ${collection} created.`);
             } else {
                 callback(MongoDatabase._itemToResult(item));
             }
@@ -143,13 +143,13 @@ class MongoDatabase {
             this._db.collection(collection).findOne(query).then(item => {
                 if (item === null) {
                     this._db.collection(collection).insertOne(data).then(item => {
-                        callback(MongoDatabase._itemToResult(item.ops[0]));
+                        callback(MongoDatabase._itemToResult(item.ops[0]), false);
                     }).catch(error => {
                         console.log(`DB: error:`, error);
                     });
                 } else {
-                    this._db.collection(collection).updateOne({_id: new ObjectID(item._id)}, data).then(item => {
-                        callback(MongoDatabase._itemToResult(item));
+                    this._db.collection(collection).updateOne({_id: new ObjectID(item._id)}, data).then(updateInfo => {
+                        callback(data, updateInfo);
                     }).catch(error => {
                         console.log(`DB: error:`, error);
                     });
@@ -157,7 +157,7 @@ class MongoDatabase {
             }).catch(error => {
                 console.log(`DB: error:`, error);
             });
-        } else console.log(`DB: error saving index "${index}", DATA is not object.`);
+        } else console.log(`DB: error saving record in "${collection}", DATA is not object.`, data);
     }
 
     remove(collection, query, callback) {

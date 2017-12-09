@@ -67,10 +67,6 @@ const common = {
                 }]
             },
         ]
-    },
-    resolve: {
-        extensions: ['.js', '.es6', '.jsx'],
-        modules: ['node_modules']
     }
 };
 
@@ -89,6 +85,10 @@ const backend = {
     externals: [
         NodeExternals({whitelist: ['babel-runtime', 'cookie-parser']})
     ],
+    resolve: {
+        extensions: ['.js', '.es6', '.jsx'],
+        modules: ['node_modules']
+    },
     plugins: [
         new webpack.NoEmitOnErrorsPlugin(),
         new webpack.optimize.UglifyJsPlugin({
@@ -121,6 +121,15 @@ const frontend = {
         path: path.resolve('./build/public'),
         publicPath: '',
         filename: './application.js'
+    },
+    resolve: {
+        extensions: ['.js', '.es6', '.jsx'],
+        modules: ['node_modules'],
+        alias: {
+            'react': 'preact-compat',
+            'react-dom': 'preact-compat',
+            'create-react-class': 'preact-compat/lib/create-react-class'
+        }
     },
     plugins: [
         new ExtractTextPlugin({

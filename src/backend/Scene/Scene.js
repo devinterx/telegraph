@@ -104,7 +104,7 @@ export default class Scene {
                 count++;
             }
         });
-        if (count > 0) console.log(`Victoriano: unloaded ${count} scene dreams.`)
+        if (count > 0) console.log(`Telegraph: unloaded ${count} scene dreams.`)
     }
 }
 

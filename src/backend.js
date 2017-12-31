@@ -41,7 +41,7 @@ class TelegraphBot {
 
         setInterval(TelegraphBot.gc, 3600000);
 
-        console.log(`Victoriano: i'am listen your dreams now. \r\n\tWeb interface: http://127.0.0.1:${
+        console.log(`Telegraph: i'am listen your dreams now. \r\n\tWeb interface: http://127.0.0.1:${
             options && options.web ? options.web.port || 8080 : 8080}.`
         );
     };
@@ -71,7 +71,7 @@ class TelegraphBot {
     };
 
     static gc = () => {
-        console.log(`Victoriano: start unloading inactive dreams.`);
+        console.log(`Telegraph: start unloading inactive dreams.`);
         User.unloadInactiveUsers();
         Scene.unloadInactiveScenes();
     };
@@ -88,7 +88,7 @@ export class Telegraph {
         const file = path.resolve(CONFIG_FILE);
 
         fs.access(file, fs.R_OK, error => {
-            if (error) return console.log(`Victoriano: config file "${CONFIG_FILE}" not found.`);
+            if (error) return console.log(`Telegraph: config file "${CONFIG_FILE}" not found.`);
 
             fs.readFile(file, 'utf8', (error, config) => {
                 if (error) throw Error('Telegraph: error read config.');

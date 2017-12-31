@@ -1,19 +1,19 @@
-import React, {Component} from "react"
+import React, {Component} from "react";
 import {Redirect, Route, Switch} from "react-router-dom"
-import Application, {Home} from "../Application/Application";
+import {Dashboard} from "../../components/Dashboard/Dashboard";
+import "./Application.less"
 
 const PageNotFound = ({location}) => (
-    <div>
+    <div className="application-router-error">
         <h1>Page <code>{location.pathname}</code> not found.</h1>
     </div>
 );
 
-const setToken = token => {
-    let date = new Date();
-    date.setTime(date.getTime() + (5 * 24 * 60 * 60 * 1000));
-
-    document.cookie = `token=${token};expires=${date.toUTCString()};path=/`;
-};
+class Application extends Component {
+    render() {
+        return <div className="application-container">{this.props.children}</div>
+    }
+}
 
 const ApplicationRouter = () => {
     return (
@@ -21,11 +21,14 @@ const ApplicationRouter = () => {
             <Switch>
                 <Route exact path='/token/:token' render={({match}) => {
                     if (match.params.token !== undefined) {
-                        setToken(match.params.token)
+                        window.application.token = match.params.token
                     }
                     return <Redirect to="/"/>
                 }}/>
-                <Route exact path='/' component={Home}/>
+
+                <Route exact path='/scenes' component={Dashboard}/>
+                <Route exact path='/users' component={Dashboard}/>
+                <Route exact path='/' component={Dashboard}/>
 
                 {/* 404 */}
                 <Redirect to={{state: {error: true}}}/>
@@ -34,7 +37,7 @@ const ApplicationRouter = () => {
     );
 };
 
-export default class Router extends Component {
+export class Router extends Component {
     constructor(props) {
         super(props);
         this.previousLocation = this.props.location;
@@ -52,14 +55,10 @@ export default class Router extends Component {
         const {location} = this.props;
         const isError = !!(location.state && location.state.error && this.previousLocation !== location);
 
-        return (
-            <div>
-                {isError ? <Route component={PageNotFound}/> : (
-                    <Switch location={isError ? this.previousLocation : location}>
-                        <Route path="/" component={ApplicationRouter}/>
-                    </Switch>
-                )}
-            </div>
+        return isError ? <Route component={PageNotFound}/> : (
+            <Switch location={isError ? this.previousLocation : location}>
+                <Route path="/" component={ApplicationRouter}/>
+            </Switch>
         )
     }
 }

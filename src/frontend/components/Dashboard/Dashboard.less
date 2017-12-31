@@ -1,0 +1,97 @@
+@import "../../containers/Application/Constants";
+
+.dashboard-container.anonymous {
+  position: relative;
+  float: left;
+
+  width: 100%;
+  height: 100%;
+  min-width: 100%;
+  min-height: 100%;
+}
+
+.dashboard-container.anonymous .logo {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+
+  width: 320px;
+  height: 320px;
+
+  margin: auto;
+
+  background: url('assets/img/dashboard/logo.png') 0 0 no-repeat;
+}
+
+.dashboard-container {
+  position: relative;
+  float: left;
+
+  width: inherit;
+  height: inherit;
+}
+
+.dashboard-container .top-menu-container {
+  position: relative;
+  width: 100%;
+  height: 64px;
+
+  border-bottom: 1px solid #ccc;
+}
+
+.dashboard-container .top-menu-container .logo {
+  position: relative;
+  float: left;
+  height: inherit;
+
+  margin: 0 10px;
+
+  background: url('assets/img/dashboard/small-logo.png') 0 0 no-repeat;
+
+  cursor: pointer;
+
+  text-indent: 76px;
+  width: 180px;
+  font-size: 1.5em;
+  color: #565656;
+  font-family: "Times New Roman", "Times", serif;
+  line-height: 64px;
+}
+
+.dashboard-container .top-menu-container ul.menu {
+  position: relative;
+  float: left;
+  height: inherit;
+}
+
+.dashboard-container .top-menu-container ul.menu li {
+  position: relative;
+  float: left;
+  height: inherit;
+  line-height: 64px;
+  padding: 0 20px;
+  border-right: 1px solid #ccc;
+  font-size: 1.2em;
+  color: #565656;
+  cursor: pointer;
+  text-transform: uppercase;
+  user-select: none;
+  font-family: "Times New Roman", "Times", serif;
+}
+
+.dashboard-container .top-menu-container ul.menu li:first-child {
+  border-left: 1px solid #ccc;
+}
+
+.dashboard-container .top-menu-container ul.menu li:hover,
+.dashboard-container .top-menu-container ul.menu li:active,
+.dashboard-container .top-menu-container ul.menu li.active {
+  background: #d8d8d8;
+}
+
+.dashboard-container .top-menu-container ul.menu li:active,
+.dashboard-container .top-menu-container ul.menu li.active {
+  cursor: default;
+}

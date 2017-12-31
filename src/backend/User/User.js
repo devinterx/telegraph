@@ -126,7 +126,7 @@ export default class User {
                 count++;
             }
         });
-        if (count > 0) console.log(`Victoriano: unloaded ${count} users dreams.`)
+        if (count > 0) console.log(`Telegraph: unloaded ${count} users dreams.`)
     }
 }
 

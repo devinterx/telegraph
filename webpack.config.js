@@ -47,6 +47,24 @@ const common = {
                 enforce: 'pre'
             },
             {
+                test: /\.less$/i,
+                use: ExtractTextPlugin.extract({
+                    fallback: 'style-loader',
+                    use: [
+                        'source-map-loader',
+                        {
+                            loader: 'css-loader',
+                            options: {
+                                publicPath: ''
+                            }
+                        },
+                        {
+                            loader: 'less-loader'
+                        },
+                    ]
+                })
+            },
+            {
                 test: /\.css$/i,
                 use: ExtractTextPlugin.extract({
                     fallback: 'style-loader',
@@ -59,6 +77,46 @@ const common = {
                             }
                         }]
                 })
+            },
+            {
+                test: /\.(jpe?g|png|gif)$/i,
+                use: [
+                    {
+                        loader: 'url-loader',
+                        options: {
+                            name: 'assets/img/[folder]/[name]-[hash].[ext]',
+                            limit: 1
+                        }
+                    },
+                    {
+                        loader: 'image-webpack-loader',
+                        query: {
+                            mozjpeg: {
+                                progressive: true,
+                            },
+                            gifsicle: {
+                                interlaced: false,
+                            },
+                            optipng: {
+                                optimizationLevel: 4,
+                            },
+                            pngquant: {
+                                quality: '75-90',
+                                speed: 3,
+                            },
+                        }
+                    }
+                ]
+            },
+            {
+                test: /\.(woff|woff2|eot|ttf|cur|svg)$/i,
+                use: [{
+                    loader: 'url-loader',
+                    options: {
+                        name: 'assets/font/[folder]/[name]-[hash].[ext]',
+                        limit: 1
+                    }
+                }]
             },
             {
                 test: /\.html$/i,
@@ -126,9 +184,9 @@ const frontend = {
         extensions: ['.js', '.es6', '.jsx'],
         modules: ['node_modules'],
         alias: {
-            'react': 'preact-compat',
-            'react-dom': 'preact-compat',
-            'create-react-class': 'preact-compat/lib/create-react-class'
+            // 'react': 'preact-compat',
+            // 'react-dom': 'preact-compat',
+            // 'create-react-class': 'preact-compat/lib/create-react-class'
         }
     },
     plugins: [

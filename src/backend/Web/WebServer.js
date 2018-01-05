@@ -31,14 +31,14 @@ export default class WebServer {
                     if (typeof user.id === 'number') user.id = user.id.toString();
                     Database.find('users', {id: user.id}, results => {
                         if (results === null) {
-                            if (!(user instanceof User)) user = new User(user);
+                            user = new User(user);
                             user._lastUpdateTime = Date.now();
                             Database.save('users', {id: user.id}, Object.assign({}, user), () => {
                                 User._users[user.id] = user;
                             });
-                            response.send("Success! User created!");
+                            response.status(200).json({error: false, message: 'User created'});
                         } else {
-                            response.status(400).json({error: 'User with this id exist!'});
+                            response.status(409).json({error: 'User with this id exist'});
                         }
                     });
                 } else response.status(403).json({error: 'Not enough permissions'});

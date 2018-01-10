@@ -21,7 +21,7 @@ export default class WebServer {
                     if (typeof userId === 'number') userId = userId.toString();
                     Database.find('users', {id: userId}, results => {
                         if (results !== null) {
-                            response.send(JSON.stringify(results));
+                            response.json(results);
                         } else {
                             response.status(409).json({error: 'User with this id not exist'});
                         }
@@ -37,7 +37,7 @@ export default class WebServer {
                     let offset = !isNaN(parseInt(request.query.offset)) ? parseInt(request.query.offset) : 0;
                     Database.list('users', {}, results => {
                         if (results !== null) {
-                            response.send(JSON.stringify(results));
+                            response.json(results);
                         } else {
                             response.status(409).json({error: 'Users not exist'});
                         }
@@ -55,9 +55,7 @@ export default class WebServer {
                         if (results === null) {
                             user = new User(user);
                             user._lastUpdateTime = Date.now();
-                            Database.save('users', {id: user.id}, Object.assign({}, user), () => {
-                                User._users[user.id] = user;
-                            });
+                            Database.save('users', {id: user.id}, Object.assign({}, user));
                             response.status(200).json({error: false, message: 'User created'});
                         } else {
                             response.status(409).json({error: 'User with this id exist'});
@@ -77,9 +75,7 @@ export default class WebServer {
                         if (results !== null) {
                             user = new User(user);
                             user._lastUpdateTime = Date.now();
-                            Database.save('users', {id: user.id}, Object.assign({}, user), () => {
-                                User._users[user.id] = user;
-                            });
+                            Database.save('users', {id: user.id}, Object.assign({}, user));
                             response.status(200).json({error: false, message: 'User updated'});
                         } else {
                             response.status(409).json({error: 'User with this id not exist'});

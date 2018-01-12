@@ -79,6 +79,11 @@ export default class User {
         });
     };
 
+    last = () => {
+        this._lastUpdateTime = Date.now();
+        return this;
+    };
+
     static addResponseChannel(channel) {
         User._channel = channel;
     }
@@ -97,10 +102,11 @@ export default class User {
         if (typeof user.id === 'number') user.id = user.id.toString();
 
         if (User._users[user.id] === undefined) {
-            if (!(user instanceof User)) user = new User(user);
-            user._lastUpdateTime = Date.now();
+            if (!(user instanceof User)) user = (new User(user)).last();
 
-            Database.load('users', {id: user.id}, () => {
+            Database.load('users', {id: user.id}, user => {
+                user = (new User(user)).last();
+
                 User._users[user.id] = user;
                 callback(User._users[user.id]);
             }, Object.assign({}, user));

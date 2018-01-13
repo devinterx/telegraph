@@ -110,8 +110,8 @@ export default class Scene {
     /* Web Request (CRUD) */
     static REST = {
         listScenes: (request, response) => {
-            Database.list('scenes', {}, results => {
-                response.send(JSON.stringify(results));
+            Database.list('scenes', {}, (scenes, count) => {
+                response.json({scenes, count});
             });
         }
     };

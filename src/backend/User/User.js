@@ -143,9 +143,9 @@ export default class User {
         listUsers: (request, response) => {
             let limit = !isNaN(parseInt(request.query.limit)) ? parseInt(request.query.limit) : 50;
             let offset = !isNaN(parseInt(request.query.offset)) ? parseInt(request.query.offset) : 0;
-            Database.list('users', {}, results => {
-                if (results !== null) {
-                    response.json(results);
+            Database.list('users', {}, (users, count) => {
+                if (users !== null) {
+                    response.json({users, count});
                 } else {
                     response.status(409).json({error: 'Users not exist'});
                 }
@@ -156,8 +156,8 @@ export default class User {
             let userId = request.params.id;
             if (typeof userId === 'number') userId = userId.toString();
             Database.find('users', {id: userId}, results => {
-                if (results !== null) {
-                    response.json(results);
+                if (results !== null && results.length > 0) {
+                    response.json({user: results[0]});
                 } else {
                     response.status(409).json({error: 'User with this id not exist'});
                 }
@@ -171,8 +171,9 @@ export default class User {
                 if (results === null) {
                     user = new User(user);
                     user._lastUpdateTime = Date.now();
-                    Database.save('users', {id: user.id}, Object.assign({}, user));
-                    response.status(200).json({error: false, message: 'User created'});
+                    Database.save('users', {id: user.id}, Object.assign({}, user), ()=> {
+                        response.json({error: false, message: 'User created'});
+                    });
                 } else {
                     response.status(409).json({error: 'User with this id exist'});
                 }
@@ -187,8 +188,9 @@ export default class User {
                 if (results !== null) {
                     user = new User(user);
                     user._lastUpdateTime = Date.now();
-                    Database.save('users', {id: user.id}, Object.assign({}, user));
-                    response.status(200).json({error: false, message: 'User updated'});
+                    Database.save('users', {id: user.id}, Object.assign({}, user), () => {
+                        response.json({error: false, message: 'User updated'});
+                    });
                 } else {
                     response.status(409).json({error: 'User with this id not exist'});
                 }
@@ -202,8 +204,8 @@ export default class User {
                 if (results !== null) {
                     Database.remove('users', {id: userId}, () => {
                         delete User._users[userId];
+                        response.json({error: false, message: 'User deleted'});
                     });
-                    response.status(200).json({error: false, message: 'User deleted'});
                 } else {
                     response.status(409).json({error: 'User with this id not exist'});
                 }

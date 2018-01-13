@@ -16,6 +16,7 @@ export default class User {
 
     static _channel;
     static _users = [];
+    static online = 0;
 
     /**
      * @param {{id, first_name, last_name, username, language_code: string}|User} user
@@ -108,6 +109,7 @@ export default class User {
                 user = (new User(user)).last();
 
                 User._users[user.id] = user;
+                User.online++;
                 callback(User._users[user.id]);
             }, Object.assign({}, user));
         } else {
@@ -121,6 +123,7 @@ export default class User {
         if (typeof user.id === 'number') user.id = user.id.toString();
         Database.save('users', {id: user.id}, Object.assign({}, user), user => {
             delete User._users[user.id];
+            User.online--;
         });
     }
 

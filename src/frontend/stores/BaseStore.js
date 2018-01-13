@@ -1,9 +1,13 @@
 import Store from "freezer-js";
 
 export default class BaseStore {
+    get state() {
+        return this._state.get();
+    }
+
     constructor(data, parentStore) {
         if (data === undefined || data === null) data = {};
-        this.state = new Store(data);
+        this._state = new Store(data);
 
         this.parentStore = parentStore || null;
 
@@ -13,11 +17,11 @@ export default class BaseStore {
     }
 
     getState() {
-        return this.state.get();
+        return this._state.get();
     }
 
     setState(state) {
-        return this.state.get().set(state);
+        return this._state.get().set(state);
     }
 
     getStore(store) {
@@ -27,15 +31,15 @@ export default class BaseStore {
     }
 
     addEventListener(eventName, callback) {
-        this.state.on(eventName, callback);
+        this._state.on(eventName, callback);
     }
 
     removeEventListener(eventName, callback) {
-        this.state.off(eventName, callback);
+        this._state.off(eventName, callback);
     }
 
     trigger(eventName, data) {
         if (data === undefined) data = {};
-        this.state.trigger(eventName, data);
+        this._state.emit(eventName, data);
     }
 }

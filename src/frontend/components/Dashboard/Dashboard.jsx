@@ -1,6 +1,7 @@
 import React, {Component} from "react";
 import HistoryStore, {ROUTE_TYPE} from "../../stores/History/History";
 import "./Dashboard.less"
+import Users from "../Users/Users";
 
 export class Dashboard extends Component {
     render() {
@@ -8,10 +9,19 @@ export class Dashboard extends Component {
 
         const route = HistoryStore.getCurrentRoute();
 
+        let container;
+        switch (route) {
+            case '/users':
+                container = <Users/>;
+                break;
+            default:
+                container = <div>{route}</div>
+        }
+
         return (
             <div className="dashboard-container">
                 <DashboardMenu/>
-                <div>{route}</div>
+                {container}
             </div>
         )
     }

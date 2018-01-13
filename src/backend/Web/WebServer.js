@@ -35,13 +35,13 @@ export default class WebServer {
                 if (permission > 0) {
                     let limit = !isNaN(parseInt(request.query.limit)) ? parseInt(request.query.limit) : 50;
                     let offset = !isNaN(parseInt(request.query.offset)) ? parseInt(request.query.offset) : 0;
-                    Database.list('users', {}, results => {
-                        if (results !== null) {
-                            response.json(results);
+                    Database.list('users', {}, (users, count) => {
+                        if (users !== null) {
+                            response.json({users, count});
                         } else {
                             response.status(409).json({error: 'Users not exist'});
                         }
-                    },limit,offset);
+                    }, limit, offset);
                 } else response.status(403).json({error: 'Not enough permissions'});
             });
         });
@@ -56,7 +56,7 @@ export default class WebServer {
                             user = new User(user);
                             user._lastUpdateTime = Date.now();
                             Database.save('users', {id: user.id}, Object.assign({}, user));
-                            response.status(200).json({error: false, message: 'User created'});
+                            response.json({error: false, message: 'User created'});
                         } else {
                             response.status(409).json({error: 'User with this id exist'});
                         }
@@ -76,7 +76,7 @@ export default class WebServer {
                             user = new User(user);
                             user._lastUpdateTime = Date.now();
                             Database.save('users', {id: user.id}, Object.assign({}, user));
-                            response.status(200).json({error: false, message: 'User updated'});
+                            response.json({error: false, message: 'User updated'});
                         } else {
                             response.status(409).json({error: 'User with this id not exist'});
                         }
@@ -95,7 +95,7 @@ export default class WebServer {
                             Database.remove('users', {id: userId}, () => {
                                 delete User._users[userId];
                             });
-                            response.status(200).json({error: false, message: 'User deleted'});
+                            response.json({error: false, message: 'User deleted'});
                         } else {
                             response.status(409).json({error: 'User with this id not exist'});
                         }
@@ -104,11 +104,19 @@ export default class WebServer {
             });
         });
 
+        server.get('/api/online', (request, response) => {
+            Database.load('sessions', {token: request.cookies['token']}, ({permission}) => {
+                if (permission > 0) {
+                    response.json({online: User.online});
+                } else response.status(403).json({error: 'Not enough permissions'});
+            });
+        });
+
         server.get('/api/scenes', (request, response) => {
             Database.load('sessions', {token: request.cookies['token']}, ({permission}) => {
                 if (permission > 0) {
-                    Database.list('scenes', {}, results => {
-                        response.send(JSON.stringify(results));
+                    Database.list('scenes', {}, (scenes, count) => {
+                        response.json(scenes, count);
                     });
                 } else response.status(403).json({error: 'Not enough permissions'});
             });

@@ -112,7 +112,16 @@ export default class Network {
     sendHTTPRequest(method, url, data, options, callback, progressCallback) {
         if (options === undefined) options = {json: true};
         if (options.json === undefined) options.json = true;
-        this.sendRequest(method, this.gate + url, options.json ? JSON.stringify(data) : data, options, progressCallback).then(
+
+        url = this.gate + url;
+
+        if (method === 'GET' && Object.keys(data).length > 0) {
+            url = new URL(url);
+            for (let key in data) if (data.hasOwnProperty(key)) url.searchParams.append(key, data[key]);
+            url = url.toString();
+        }
+
+        this.sendRequest(method, url, options.json ? JSON.stringify(data) : data, options, progressCallback).then(
             (response) => {
                 if (callback) callback(response);
             },

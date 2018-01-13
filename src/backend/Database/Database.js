@@ -95,7 +95,10 @@ class MongoDatabase {
             for (let i = 0; i < results.length; i++) {
                 items.push(MongoDatabase._itemToResult(results[i]));
             }
-            callback(items)
+
+            cursor.count().then(count => {
+                callback(items, count);
+            });
         });
     }
 

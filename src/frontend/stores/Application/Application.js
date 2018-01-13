@@ -1,10 +1,11 @@
 import BaseStore from "../BaseStore";
 import Network from "../../drivers/Network/Network";
 import HistoryStore from "../History/History";
+import UsersStore from "../components/Users/Users";
 
 export default class ApplicationStore extends BaseStore {
     get token() {
-        return this.state.get().token;
+        return this._state.get().token;
     }
 
     set token(token) {
@@ -14,7 +15,7 @@ export default class ApplicationStore extends BaseStore {
 
         document.cookie = `token=${token};expires=${date.toUTCString()};path=/`;
 
-        return this.state.get().set({token});
+        return this._state.get().set({token});
     }
 
     constructor() {
@@ -24,14 +25,19 @@ export default class ApplicationStore extends BaseStore {
             token: t ? t[1] : null
         });
 
+        /** @type {Network} */
+        this.network = new Network();
+
         /** @type {{
          *    _: {ApplicationStore},
-         *    History: {HistoryStore}
+         *    History: {HistoryStore},
+         *    Users: {UsersStore}
          * }}
          */
         this.stores = {
             _: this,
             History: new HistoryStore(),
+            Users: new UsersStore(this, true),
         };
 
         // Fast store access
@@ -41,7 +47,7 @@ export default class ApplicationStore extends BaseStore {
         /** @type {HistoryStore} */
         this.History = this.stores.History;
 
-        /** @type {Network} */
-        this.network = new Network();
+        /** @type {UsersStore} */
+        this.Users = this.stores.Users;
     }
 }

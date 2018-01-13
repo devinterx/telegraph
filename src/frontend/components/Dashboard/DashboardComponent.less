@@ -1,0 +1,63 @@
+.dashboard-component {
+  position: relative;
+  width: 100%;
+}
+
+.dashboard-component .table,
+.dashboard-component .row,
+.dashboard-component .cell {
+  display: block;
+}
+
+.dashboard-component .table {
+  display: table;
+  overflow: hidden;
+  position: relative;
+  width: 100%;
+}
+
+.dashboard-component .row {
+  display: table-row;
+  width: 100%;
+}
+
+.dashboard-component .row.header {
+  font-weight: bold;
+}
+
+.dashboard-component .row:nth-child(even) {
+  background: #d6d6d6;
+}
+
+.dashboard-component .row:nth-child(odd) {
+  background: #e6e6e6;
+}
+
+.dashboard-component .cell {
+  display: table-cell;
+  clear: right;
+  zoom: 1;
+  padding: 4px 10px;
+}
+
+/* Paginator */
+
+ul.dashboard-component-paginator {
+  position: relative;
+  float: left;
+  width: 100%;
+}
+
+ul.dashboard-component-paginator li {
+  position: relative;
+  float: left;
+  border: 1px solid #ccc;
+  padding: 4px 7px 4px 5px;
+  margin-right: 1px;
+  cursor: pointer;
+}
+
+ul.dashboard-component-paginator li.active {
+  cursor: default;
+  color: #8e8e8e;
+}

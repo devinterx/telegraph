@@ -106,6 +106,15 @@ export default class Scene {
         });
         if (count > 0) console.log(`Telegraph: unloaded ${count} scene dreams.`)
     }
+
+    /* Web Request (CRUD) */
+    static REST = {
+        listScenes: (request, response) => {
+            Database.list('scenes', {}, results => {
+                response.send(JSON.stringify(results));
+            });
+        }
+    };
 }
 
 const DEFAULT_SCENE = {

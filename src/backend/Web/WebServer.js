@@ -5,7 +5,21 @@ import path from "path";
 
 import Database from "../Database/Database"
 import User from "../User/User"
-import {session} from "../Auth/Auth"
+import Scene from "../Scene/Scene"
+import {PERMISSION, session} from "../Auth/Auth"
+
+// [METHOD, ROUTE, HANDLER, PERMISSION]
+const ROUTES = [
+    // Users
+    ['GET', '/api/users/:id', User.REST.getUser, PERMISSION.ADMINISTRATOR],
+    ['GET', '/api/users', User.REST.listUsers, PERMISSION.ADMINISTRATOR],
+    ['POST', '/api/users', User.REST.createUser, PERMISSION.ADMINISTRATOR],
+    ['PUT', '/api/users/:id', User.REST.updateUser, PERMISSION.ADMINISTRATOR],
+    ['DELETE', '/api/users/:id', User.REST.deleteUser, PERMISSION.ADMINISTRATOR],
+
+    // Scenes
+    ['GET', '/api/scenes', Scene.REST.listScenes, PERMISSION.ADMINISTRATOR],
+];
 
 export default class WebServer {
     static init(server, express) {
@@ -14,104 +28,22 @@ export default class WebServer {
         server.use(bodyParser.json());
         server.use(session);
 
-        server.get('/api/users/:id', (request, response) => {
-            Database.load('sessions', {token: request.cookies['token']}, ({permission}) => {
-                if (permission > 0) {
-                    let userId = request.params.id;
-                    if (typeof userId === 'number') userId = userId.toString();
-                    Database.find('users', {id: userId}, results => {
-                        if (results !== null) {
-                            response.json(results);
-                        } else {
-                            response.status(409).json({error: 'User with this id not exist'});
-                        }
-                    });
-                } else response.status(403).json({error: 'Not enough permissions'});
-            });
-        });
+        for (let i = 0; i < ROUTES.length; i++) {
+            let grantHandler, [method, route, handler, level] = ROUTES[i];
 
-        server.get('/api/users/', (request, response) => {
-            Database.load('sessions', {token: request.cookies['token']}, ({permission}) => {
-                if (permission > 0) {
-                    let limit = !isNaN(parseInt(request.query.limit)) ? parseInt(request.query.limit) : 50;
-                    let offset = !isNaN(parseInt(request.query.offset)) ? parseInt(request.query.offset) : 0;
-                    Database.list('users', {}, results => {
-                        if (results !== null) {
-                            response.json(results);
-                        } else {
-                            response.status(409).json({error: 'Users not exist'});
-                        }
-                    },limit,offset);
-                } else response.status(403).json({error: 'Not enough permissions'});
-            });
-        });
+            if (level !== undefined && level !== PERMISSION.USER) {
+                grantHandler = (request, response) => WebServer._grantRequest(level, handler, request, response);
+            }
 
-        server.post('/api/users', (request, response) => {
-            Database.load('sessions', {token: request.cookies['token']}, ({permission}) => {
-                if (permission > 0) {
-                    let user = request.body['user'];
-                    if (typeof user.id === 'number') user.id = user.id.toString();
-                    Database.find('users', {id: user.id}, results => {
-                        if (results === null) {
-                            user = new User(user);
-                            user._lastUpdateTime = Date.now();
-                            Database.save('users', {id: user.id}, Object.assign({}, user));
-                            response.status(200).json({error: false, message: 'User created'});
-                        } else {
-                            response.status(409).json({error: 'User with this id exist'});
-                        }
-                    });
-                } else response.status(403).json({error: 'Not enough permissions'});
-            });
-        });
+            server[method.toLowerCase()](route, grantHandler || handler);
+        }
+    }
 
-        server.put('/api/users/:id', (request, response) => {
-            Database.load('sessions', {token: request.cookies['token']}, ({permission}) => {
-                if (permission > 0) {
-                    let user = request.body['user'];
-                    user.id = request.params.id;
-                    if (typeof user.id === 'number') user.id = user.id.toString();
-                    Database.find('users', {id: user.id}, results => {
-                        if (results !== null) {
-                            user = new User(user);
-                            user._lastUpdateTime = Date.now();
-                            Database.save('users', {id: user.id}, Object.assign({}, user));
-                            response.status(200).json({error: false, message: 'User updated'});
-                        } else {
-                            response.status(409).json({error: 'User with this id not exist'});
-                        }
-                    });
-                } else response.status(403).json({error: 'Not enough permissions'});
-            });
-        });
-
-        server.delete('/api/users/:id', (request, response) => {
-            Database.load('sessions', {token: request.cookies['token']}, ({permission}) => {
-                if (permission > 0) {
-                    let userId = request.params.id;
-                    if (typeof userId === 'number') userId = userId.toString();
-                    Database.find('users', {id: userId}, results => {
-                        if (results !== null) {
-                            Database.remove('users', {id: userId}, () => {
-                                delete User._users[userId];
-                            });
-                            response.status(200).json({error: false, message: 'User deleted'});
-                        } else {
-                            response.status(409).json({error: 'User with this id not exist'});
-                        }
-                    });
-                } else response.status(403).json({error: 'Not enough permissions'});
-            });
-        });
-
-        server.get('/api/scenes', (request, response) => {
-            Database.load('sessions', {token: request.cookies['token']}, ({permission}) => {
-                if (permission > 0) {
-                    Database.list('scenes', {}, results => {
-                        response.send(JSON.stringify(results));
-                    });
-                } else response.status(403).json({error: 'Not enough permissions'});
-            });
+    static _grantRequest(level, handler, request, response) {
+        Database.load('sessions', {token: request.cookies['token']}, ({permission}) => {
+            if (permission >= level) {
+                handler(request, response);
+            } else response.status(403).json({error: 'Not enough permissions'});
         });
     }
 }

@@ -79,6 +79,11 @@ export default class User {
         });
     };
 
+    last = () => {
+        this._lastUpdateTime = Date.now();
+        return this;
+    };
+
     static addResponseChannel(channel) {
         User._channel = channel;
     }
@@ -97,10 +102,11 @@ export default class User {
         if (typeof user.id === 'number') user.id = user.id.toString();
 
         if (User._users[user.id] === undefined) {
-            if (!(user instanceof User)) user = new User(user);
-            user._lastUpdateTime = Date.now();
+            if (!(user instanceof User)) user = (new User(user)).last();
 
-            Database.load('users', {id: user.id}, () => {
+            Database.load('users', {id: user.id}, user => {
+                user = (new User(user)).last();
+
                 User._users[user.id] = user;
                 callback(User._users[user.id]);
             }, Object.assign({}, user));
@@ -128,6 +134,79 @@ export default class User {
         });
         if (count > 0) console.log(`Victoriano: unloaded ${count} users dreams.`)
     }
+
+    /* Web Request (CRUD) */
+    static REST = {
+        listUsers: (request, response) => {
+            let limit = !isNaN(parseInt(request.query.limit)) ? parseInt(request.query.limit) : 50;
+            let offset = !isNaN(parseInt(request.query.offset)) ? parseInt(request.query.offset) : 0;
+            Database.list('users', {}, results => {
+                if (results !== null) {
+                    response.json(results);
+                } else {
+                    response.status(409).json({error: 'Users not exist'});
+                }
+            }, limit, offset);
+        },
+
+        getUser: (request, response) => {
+            let userId = request.params.id;
+            if (typeof userId === 'number') userId = userId.toString();
+            Database.find('users', {id: userId}, results => {
+                if (results !== null) {
+                    response.json(results);
+                } else {
+                    response.status(409).json({error: 'User with this id not exist'});
+                }
+            });
+        },
+
+        createUser: (request, response) => {
+            let user = request.body['user'];
+            if (typeof user.id === 'number') user.id = user.id.toString();
+            Database.find('users', {id: user.id}, results => {
+                if (results === null) {
+                    user = new User(user);
+                    user._lastUpdateTime = Date.now();
+                    Database.save('users', {id: user.id}, Object.assign({}, user));
+                    response.status(200).json({error: false, message: 'User created'});
+                } else {
+                    response.status(409).json({error: 'User with this id exist'});
+                }
+            });
+        },
+
+        updateUser: (request, response) => {
+            let user = request.body['user'];
+            user.id = request.params.id;
+            if (typeof user.id === 'number') user.id = user.id.toString();
+            Database.find('users', {id: user.id}, results => {
+                if (results !== null) {
+                    user = new User(user);
+                    user._lastUpdateTime = Date.now();
+                    Database.save('users', {id: user.id}, Object.assign({}, user));
+                    response.status(200).json({error: false, message: 'User updated'});
+                } else {
+                    response.status(409).json({error: 'User with this id not exist'});
+                }
+            });
+        },
+
+        deleteUser: (request, response) => {
+            let userId = request.params.id;
+            if (typeof userId === 'number') userId = userId.toString();
+            Database.find('users', {id: userId}, results => {
+                if (results !== null) {
+                    Database.remove('users', {id: userId}, () => {
+                        delete User._users[userId];
+                    });
+                    response.status(200).json({error: false, message: 'User deleted'});
+                } else {
+                    response.status(409).json({error: 'User with this id not exist'});
+                }
+            });
+        }
+    };
 }
 
 class UserData {

@@ -1,7 +1,8 @@
 import cookieParser from "cookie-parser";
 import path from "path";
 
-import Database from "../Database/Database"
+import Database from "../Database/Database";
+import Scene from "../Scene/Scene";
 import {session} from "../Auth/Auth"
 
 export default class WebServer {

@@ -18,6 +18,7 @@ const ROUTES = [
     ['DELETE', '/api/users/:id', User.REST.deleteUser, PERMISSION.ADMINISTRATOR],
 
     // Scenes
+    ['GET', '/api/scenes', Scene.REST.getScenes, PERMISSION.ADMINISTRATOR],
     ['GET', '/api/scenes', Scene.REST.listScenes, PERMISSION.ADMINISTRATOR],
 ];
 

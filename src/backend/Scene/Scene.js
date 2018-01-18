@@ -113,7 +113,25 @@ export default class Scene {
             Database.list('scenes', {}, results => {
                 response.send(JSON.stringify(results));
             });
+        },
+
+        getScenes: (request, response) => {
+            let sceneId = request.params.id;
+            if (typeof sceneId === 'number') sceneId = sceneId.toString();
+            Database.find('scenes', {id: sceneId}, results => {
+                if (results !== null) {
+                    response.json(results);
+                } else {
+                    response.status(409).json({error: 'Scene with this id not exist'});
+                }
+            });
+        },
+
+        createScene: (request, response) => {
+            let scene = request.body['scenes'];
+            
         }
+
     };
 }
 

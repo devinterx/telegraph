@@ -180,8 +180,6 @@ export default class Scene {
                 }
             });
         }
-
-
     };
 }
 

@@ -1,6 +1,4 @@
 import Database from "../Database/Database"
-import {PERMISSION} from "../Auth/Auth";
-import Command from "../Command/Command"
 
 export default class Scene {
     id;

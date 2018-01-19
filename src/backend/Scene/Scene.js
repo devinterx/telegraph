@@ -112,9 +112,15 @@ export default class Scene {
     /* Web Request (CRUD) */
     static REST = {
         listScenes: (request, response) => {
+            let limit = !isNaN(parseInt(request.query.limit)) ? parseInt(request.query.limit) : 50;
+            let offset = !isNaN(parseInt(request.query.offset)) ? parseInt(request.query.offset) : 0;
             Database.list('scenes', {}, results => {
-                response.send(JSON.stringify(results));
-            });
+                if(results !==null) {
+                    response.send(JSON.stringify(results));
+                } else {
+                    response.status(409).json({error: 'Scene not exist'});
+                }
+            }, limit, offset);
         },
 
         getScene: (request, response) => {

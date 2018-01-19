@@ -18,8 +18,11 @@ const ROUTES = [
     ['DELETE', '/api/users/:id', User.REST.deleteUser, PERMISSION.ADMINISTRATOR],
 
     // Scenes
-    ['GET', '/api/scenes', Scene.REST.getScenes, PERMISSION.ADMINISTRATOR],
+    ['GET', '/api/scenes/:id', Scene.REST.getScene, PERMISSION.ADMINISTRATOR],
     ['GET', '/api/scenes', Scene.REST.listScenes, PERMISSION.ADMINISTRATOR],
+    ['POST', '/api/scenes', Scene.REST.createScene, PERMISSION.ADMINISTRATOR],
+    ['PUT', '/api/scenes/:id', Scene.REST.updateScene, PERMISSION.ADMINISTRATOR],
+    ['DELETE', '/api/scenes/:id', Scene.REST.deleteScene, PERMISSION.ADMINISTRATOR],
 ];
 
 export default class WebServer {

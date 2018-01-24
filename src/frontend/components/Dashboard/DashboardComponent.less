@@ -1,6 +1,14 @@
 .dashboard-component {
   position: relative;
   width: 100%;
+
+  background-color: #fff;
+  border: none #e6e9ed;
+  -webkit-box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+  -moz-box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
 }
 
 .dashboard-component .table,
@@ -19,18 +27,32 @@
 .dashboard-component .row {
   display: table-row;
   width: 100%;
+
+  padding: 8px;
+  line-height: 1.42857143;
+  vertical-align: top;
+  border-top: 1px solid #ddd;
+  border-collapse: collapse;
+}
+
+.dashboard-component .row:nth-child(even) {
+  background: #efefef;
+}
+
+.dashboard-component .row:nth-child(odd) {
+  background: #f7f7f7;
 }
 
 .dashboard-component .row.header {
   font-weight: bold;
-}
-
-.dashboard-component .row:nth-child(even) {
-  background: #d6d6d6;
-}
-
-.dashboard-component .row:nth-child(odd) {
-  background: #e6e6e6;
+  color: #434a54;
+  background-color: #e4e4e4;
+  border-color: #e6e9ed;
+  border-radius: 4px 4px 0 0;
+  -webkit-border-radius: 4px 4px 0 0;
+  -moz-border-radius: 4px 4px 0 0;
+  padding: 10px 15px;
+  border-bottom: 1px solid transparent;
 }
 
 .dashboard-component .cell {

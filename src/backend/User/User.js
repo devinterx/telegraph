@@ -171,7 +171,7 @@ export default class User {
                 if (results === null) {
                     user = new User(user);
                     user._lastUpdateTime = Date.now();
-                    Database.save('users', {id: user.id}, Object.assign({}, user), ()=> {
+                    Database.save('users', {id: user.id}, Object.assign({}, user), () => {
                         response.json({error: false, message: 'User created'});
                     });
                 } else {

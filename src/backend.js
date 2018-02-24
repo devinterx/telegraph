@@ -27,7 +27,7 @@ const TOKEN = '';
  *  bot:{polling:boolean}
  * }}
  */
-const CONFIG_FILE = path.resolve('./config.js');
+const CONFIG_FILE = path.resolve('./config.json');
 
 class TelegraphBot {
     _bot;

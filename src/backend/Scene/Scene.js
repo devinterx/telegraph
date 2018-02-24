@@ -113,7 +113,7 @@ export default class Scene {
             let limit = !isNaN(parseInt(request.query.limit)) ? parseInt(request.query.limit) : 50;
             let offset = !isNaN(parseInt(request.query.offset)) ? parseInt(request.query.offset) : 0;
             Database.list('scenes', {}, results => {
-                if(results !==null) {
+                if (results !== null) {
                     response.send(JSON.stringify(results));
                 } else {
                     response.status(409).json({error: 'Scene not exist'});
@@ -135,13 +135,13 @@ export default class Scene {
 
         createScene: (request, response) => {
             let scene = request.body['scene'];
-            if (typeof scene.id === 'number' ) scene = scene.toString();
+            if (typeof scene.id === 'number') scene = scene.toString();
             Database.find('scenes', {id: scene.id}, results => {
                 if (results === null) {
                     scene = new Scene(scene);
                     scene._lastUpdateTime = Date.now();
                     Database.save('scenes', {id: scene.id}, Object.assign({}, scene));
-                    response.status(200).json({error: false, messages: "Scene created"});
+                    response.json({error: false, messages: "Scene created"});
                 } else {
                     response.status(409).json({error: 'Scene with this id exist'});
                 }
@@ -157,7 +157,7 @@ export default class Scene {
                     scene = new Scene(scene);
                     scene._lastUpdateTime = Date.now();
                     Database.save('scenes', {id: scene.id}, Object.assign({}, scene));
-                    response.status(200).json({error: false, messages: 'Scene updated'});
+                    response.json({error: false, messages: 'Scene updated'});
                 } else {
                     response.status(409).json({error: 'Scene with this id not exist'});
                 }
@@ -168,10 +168,10 @@ export default class Scene {
             let sceneId = request.params.id;
             if (typeof sceneId === 'number') sceneId = sceneId.toString();
             Database.find('scenes', {id: sceneId}, results => {
-                if(results !== null) {
+                if (results !== null) {
                     Database.remove('scenes', {id: sceneId}, () => {
                         delete Scene._scenes[sceneId];
-                        response.status(200).json({error: false, messages: 'Scene deleted'});
+                        response.json({error: false, messages: 'Scene deleted'});
                     })
                 } else {
                     response.status(409).json({error: 'Scene with this id not exist'});

@@ -169,7 +169,7 @@ export default class User {
                     user = new User(user);
                     user._lastUpdateTime = Date.now();
                     Database.save('users', {id: user.id}, Object.assign({}, user));
-                    response.status(200).json({error: false, message: 'User created'});
+                    response.json({error: false, message: 'User created'});
                 } else {
                     response.status(409).json({error: 'User with this id exist'});
                 }
@@ -185,7 +185,7 @@ export default class User {
                     user = new User(user);
                     user._lastUpdateTime = Date.now();
                     Database.save('users', {id: user.id}, Object.assign({}, user));
-                    response.status(200).json({error: false, message: 'User updated'});
+                    response.json({error: false, message: 'User updated'});
                 } else {
                     response.status(409).json({error: 'User with this id not exist'});
                 }
@@ -200,7 +200,7 @@ export default class User {
                     Database.remove('users', {id: userId}, () => {
                         delete User._users[userId];
                     });
-                    response.status(200).json({error: false, message: 'User deleted'});
+                    response.json({error: false, message: 'User deleted'});
                 } else {
                     response.status(409).json({error: 'User with this id not exist'});
                 }

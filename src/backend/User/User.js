@@ -155,9 +155,9 @@ export default class User {
         getUser: (request, response) => {
             let userId = request.params.id;
             if (typeof userId === 'number') userId = userId.toString();
-            Database.find('users', {id: userId}, results => {
-                if (results !== null && results.length > 0) {
-                    response.json({user: results[0]});
+            Database.find('users', {id: userId}, users => {
+                if (users !== null && users.length > 0) {
+                    response.json({user: users[0]});
                 } else {
                     response.status(409).json({error: 'User with this id not exist'});
                 }
@@ -206,6 +206,7 @@ export default class User {
                         delete User._users[userId];
                         response.json({error: false, message: 'User deleted'});
                     });
+                    response.json({error: false, message: 'User deleted'});
                 } else {
                     response.status(409).json({error: 'User with this id not exist'});
                 }

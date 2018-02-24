@@ -12,7 +12,22 @@ import path from "path"
 require('babel-register');
 
 const TOKEN = '';
-const CONFIG_FILE = "./config.json";
+
+/**
+ * @type {{
+ *  db:{database:string, mongodb:{
+ *    host:string,
+ *    port:int,
+ *    db:string,
+ *    user:string
+ *    password:string
+ *  }},
+ *  services:{web:boolean, bot:boolean},
+ *  web:{host:string, ip:string, port:int},
+ *  bot:{polling:boolean}
+ * }}
+ */
+const CONFIG_FILE = path.resolve('./config.js');
 
 class TelegraphBot {
     _bot;

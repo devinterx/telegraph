@@ -1,4 +1,20 @@
 @import "Constants";
+@import "assets/fonts/awesome/awesome.less";
+@import "assets/fonts/awesome/fa-solid.less";
+@import "assets/fonts/awesome/fa-regular.less";
+
+* {
+  margin: 0;
+  padding: 0;
+  border: none;
+  outline: none;
+}
+
+*, :after, :before {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
 
 /* HTML5 display definitions */
 section, nav, article, aside, hgroup,
@@ -23,18 +39,36 @@ audio:not([controls]) {
 /* The root element */
 
 html {
-  font-size: 100%;
+  position: relative;
+  min-height: 100%;
+
+  margin: 0;
+  padding: 0;
+
+  background: #ffffff;
   overflow-y: scroll;
+
+  font-family: sans-serif;
+  font-size: 10px;
+
   -webkit-text-size-adjust: 100%;
   -ms-text-size-adjust: 100%;
   -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 }
 
-/* Sections */
-
 body {
-  font-family: sans-serif;
+  min-height: 100%;
+
   margin: 0;
+  padding: 0;
+
+  background: #ffffff;
+  direction: ltr;
+
+  font-family: "Open Sans", Arial, Helvetica, sans-serif;
+  font-size: 13px;
+  line-height: 1.4em;
+  color: #333;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -69,16 +103,18 @@ ol, ul {
 
 li {
   list-style: none;
+  display: list-item;
+  text-align: -webkit-match-parent;
 }
 
 /* Text-level semantics */
 
 a:focus {
-  outline: thin dotted;
+  outline: none;
 }
 
 a:hover, a:active {
-  outline: 0;
+  outline: none;
 }
 
 strong, b {
@@ -244,8 +280,6 @@ canvas {
 html, body {
   background-color: @background;
   overflow: hidden;
-  -webkit-font-smoothing: subpixel-antialiased;
-  -moz-osx-font-smoothing: auto;
 
   width: 100%;
   height: 100%;

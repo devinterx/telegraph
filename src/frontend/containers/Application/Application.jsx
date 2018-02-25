@@ -1,6 +1,7 @@
 import React, {Component} from "react";
 import {Redirect, Route, Switch} from "react-router-dom"
 import {Dashboard} from "../../components/Dashboard/Dashboard";
+import {ROUTE_TYPE} from "../../stores/History/History";
 import "./Application.less"
 
 const PageNotFound = ({location}) => (
@@ -16,6 +17,9 @@ class Application extends Component {
 }
 
 const ApplicationRouter = () => {
+    let routes = Object.values(ROUTE_TYPE);
+    routes.reverse();
+
     return (
         <Application>
             <Switch>
@@ -26,9 +30,7 @@ const ApplicationRouter = () => {
                     return <Redirect to="/"/>
                 }}/>
 
-                <Route exact path='/scenes' component={Dashboard}/>
-                <Route exact path='/users' component={Dashboard}/>
-                <Route exact path='/' component={Dashboard}/>
+                {routes.map((route, i) => <Route exact path={route} component={Dashboard} key={`route-${i}`}/>)}
 
                 {/* 404 */}
                 <Redirect to={{state: {error: true}}}/>

@@ -8,58 +8,51 @@ const SIDEBAR_MENU = [
         id: 'dashboard',
         label: 'Dashboard',
         icon: 'fa-home',
-        onClick: () => {
-            window.application.History.toRoute(ROUTE_TYPE.ON_HOME);
-        },
+        onClick: () => window.application.History.toRoute(ROUTE_TYPE.ON_HOME),
         active: () => HistoryStore.getCurrentRoute() === ROUTE_TYPE.ON_HOME
     },
     {
         id: 'scenes',
         label: 'Scenes',
         icon: 'fa-puzzle-piece',
-        onClick: () => {
-            window.application.History.toRoute(ROUTE_TYPE.ON_SCENES);
-        },
-        badge: 1,
+        onClick: () => window.application.History.toRoute(ROUTE_TYPE.ON_SCENES),
         active: () => HistoryStore.getCurrentRoute().startsWith(ROUTE_TYPE.ON_SCENES)
     },
     {
         id: 'users',
         label: 'Users',
         icon: 'fa-users',
-        onClick: () => {
-            window.application.History.toRoute(ROUTE_TYPE.ON_USERS);
-        },
+        onClick: () => window.application.History.toRoute(ROUTE_TYPE.ON_USERS),
         active: () => HistoryStore.getCurrentRoute().startsWith(ROUTE_TYPE.ON_USERS)
     },
-    {
-        id: 'test',
-        label: 'Test',
-        icon: 'fa-table',
-        active: (i) => HistoryStore.getCurrentRoute().startsWith(ROUTE_TYPE.ON_TEST) && !i.isOpen,
-        open: () => HistoryStore.getCurrentRoute().startsWith(ROUTE_TYPE.ON_TEST),
-        children: [
-            {
-                id: 'test-1',
-                label: 'Test 1',
-                icon: 'fa-puzzle-piece',
-                onClick: () => {
-                    window.application.History.toRoute(ROUTE_TYPE.ON_TEST_1);
-                },
-                active: () => HistoryStore.getCurrentRoute().startsWith(ROUTE_TYPE.ON_TEST_1)
-            },
-            {
-                id: 'test-2',
-                label: 'Test 2',
-                icon: 'fa-puzzle-piece',
-                onClick: () => {
-                    window.application.History.toRoute(ROUTE_TYPE.ON_TEST_2);
-                },
-                active: () => HistoryStore.getCurrentRoute().startsWith(ROUTE_TYPE.ON_TEST_2),
-                badge: 'new',
-            }
-        ]
-    }
+    // {
+    //     id: 'test',
+    //     label: 'Test',
+    //     icon: 'fa-table',
+    //     active: (i) => HistoryStore.getCurrentRoute().startsWith(ROUTE_TYPE.ON_TEST) && !i.isOpen,
+    //     open: () => HistoryStore.getCurrentRoute().startsWith(ROUTE_TYPE.ON_TEST),
+    //     children: [
+    //         {
+    //             id: 'test-1',
+    //             label: 'Test 1',
+    //             icon: 'fa-puzzle-piece',
+    //             onClick: () => {
+    //                 window.application.History.toRoute(ROUTE_TYPE.ON_TEST_1);
+    //             },
+    //             active: () => HistoryStore.getCurrentRoute().startsWith(ROUTE_TYPE.ON_TEST_1)
+    //         },
+    //         {
+    //             id: 'test-2',
+    //             label: 'Test 2',
+    //             icon: 'fa-puzzle-piece',
+    //             onClick: () => {
+    //                 window.application.History.toRoute(ROUTE_TYPE.ON_TEST_2);
+    //             },
+    //             active: () => HistoryStore.getCurrentRoute().startsWith(ROUTE_TYPE.ON_TEST_2),
+    //             badge: 'new',
+    //         }
+    //     ]
+    // }
 ];
 
 export class Dashboard extends Component {
@@ -72,7 +65,6 @@ export class Dashboard extends Component {
     }
 
     onToggleMinimize = () => {
-        console.log('bu');
         this.setState({
             isMinimized: !this.state.isMinimized
         });

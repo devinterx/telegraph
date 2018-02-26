@@ -9,12 +9,14 @@ export default class User {
     lastName;
     userName;
     languageCode = 'en';
+    avatar = false;
 
     data;
 
     _lastUpdateTime = 0;
 
     static _channel;
+    static _token;
     static _users = [];
     static online = 0;
 
@@ -27,6 +29,7 @@ export default class User {
         this.lastName = user.lastName || user.last_name;
         this.userName = user.userName || user.username;
         this.languageCode = user.languageCode || user.language_code;
+        this.avatar = user.avatar || false;
         this.data = user.data || new UserData();
     }
 
@@ -80,13 +83,30 @@ export default class User {
         });
     };
 
+    checkAndUpdateAvatar = () => {
+        // const profile = User._channel.getUserProfilePhotos(session.userId);
+        // profile.then(resources => {
+        //     const fileId = resources.photos[0][0].file_id;
+        //     if (fileId) {
+        //         const file = User._channel.getFile(fileId);
+        //         file.then(result => {
+        //             const path = result.file_path;
+        //             this.avatar = `https://api.telegram.org/file/bot${User._token}/${path}`;
+        //         });
+        //     } else {
+        //         this.avatar = false
+        //     }
+        // });
+    };
+
     last = () => {
         this._lastUpdateTime = Date.now();
         return this;
     };
 
-    static addResponseChannel(channel) {
+    static addResponseChannel(channel, token) {
         User._channel = channel;
+        User._token = token;
     }
 
     /**
@@ -105,13 +125,35 @@ export default class User {
         if (User._users[user.id] === undefined) {
             if (!(user instanceof User)) user = (new User(user)).last();
 
-            Database.load('users', {id: user.id}, user => {
-                user = (new User(user)).last();
+            Database.find('users', {id: user.id}, users => {
+                if (users !== null && users.length > 0) {
+                    // update user, load him and async (check & update avatar)
+                    let _user = new User(users[0]).last();
+                    if (_user.languageCode !== user.languageCode
+                        || _user.firstName !== user.firstName
+                        || _user.lastName !== user.lastName
+                        || _user.userName !== user.userName
+                    ) {
+                        _user.languageCode = user.languageCode;
+                        _user.firstName = user.firstName;
+                        _user.lastName = user.lastName;
+                        _user.userName = user.userName;
+                    }
 
-                User._users[user.id] = user;
-                User.online++;
-                callback(User._users[user.id]);
-            }, Object.assign({}, user));
+                    User._users[_user.id] = _user;
+                    User.online++;
+                    _user.checkAndUpdateAvatar();
+                    callback(User._users[_user.id]);
+                } else {
+                    // create user, load him and upload avatar
+                    Database.save('users', {id: user.id}, user, () => {
+                        User._users[user.id] = user;
+                        User.online++;
+                        user.checkAndUpdateAvatar();
+                        callback(User._users[user.id]);
+                    });
+                }
+            });
         } else {
             User._users[user.id]._lastUpdateTime = Date.now();
             callback(User._users[user.id]);
@@ -135,7 +177,7 @@ export default class User {
                 count++;
             }
         });
-        if (count > 0) console.log(`Telegraph: unloaded ${count} users dreams.`)
+        if (count > 0) console.log(`Telegraph: unloaded ${count} users dreams`)
     }
 
     /* Web Request (CRUD) */
@@ -213,8 +255,27 @@ export default class User {
             });
         },
 
-        online: (request, response) => {
+        getOnline: (request, response) => {
             response.json({online: User.online});
+        },
+
+        getMeInfo: (request, response, session) => {
+            Database.find('users', {id: session.userId}, users => {
+                if (users !== null && users.length > 0) {
+                    const user = users[0];
+                    response.json({
+                        id: session.userId,
+                        permission: session.permission,
+                        language: user.languageCode,
+                        firstName: user.firstName,
+                        lastName: user.lastName,
+                        userName: user.userName,
+                        avatar: user.avatar || false
+                    });
+                } else {
+                    response.status(409).json({error: 'User data in database incorrect'});
+                }
+            });
         }
     };
 }

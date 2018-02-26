@@ -17,7 +17,8 @@ const ROUTES = [
     ['PUT', '/api/users/:id', User.REST.updateUser, PERMISSION.ADMINISTRATOR],
     ['DELETE', '/api/users/:id', User.REST.deleteUser, PERMISSION.ADMINISTRATOR],
 
-    ['GET', '/api/online', User.REST.online, PERMISSION.ADMINISTRATOR],
+    ['GET', '/api/online', User.REST.getOnline, PERMISSION.ADMINISTRATOR],
+    ['GET', '/api/me', User.REST.getMeInfo, PERMISSION.USER],
 
     // Scenes
     ['GET', '/api/scenes/:id', Scene.REST.getScene, PERMISSION.ADMINISTRATOR],
@@ -37,7 +38,7 @@ export default class WebServer {
         for (let i = 0; i < ROUTES.length; i++) {
             let grantHandler, [method, route, handler, level] = ROUTES[i];
 
-            if (level !== undefined && level !== PERMISSION.USER) {
+            if (level !== undefined) {
                 grantHandler = (request, response) => WebServer._grantRequest(level, handler, request, response);
             }
 
@@ -46,9 +47,9 @@ export default class WebServer {
     }
 
     static _grantRequest(level, handler, request, response) {
-        Database.load('sessions', {token: request.cookies['token']}, ({permission}) => {
-            if (permission >= level) {
-                handler(request, response);
+        Database.load('sessions', {token: request.cookies['token']}, session => {
+            if (session && session.permission >= level) {
+                handler(request, response, session);
             } else response.status(403).json({error: 'Not enough permissions'});
         });
     }

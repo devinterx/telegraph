@@ -39,7 +39,9 @@ class TelegraphBot {
 
         Database.init(config.db, () => {
             if (this._server) WebServer.init(this._server, Express);
-            if (this._bot) User.addResponseChannel(this._bot);
+            if (this._bot) {
+                User.addResponseChannel(this._bot, token);
+            }
             this._listen(config);
         });
     }

@@ -115,7 +115,7 @@ export default class Scene {
 
             Database.list('scenes', {}, (scenes, count) => {
                 if (scenes !== null) {
-                    response.json(scenes, count);
+                    response.json({scenes, count});
                 } else {
                     response.status(409).json({error: 'Scene not exist'});
                 }

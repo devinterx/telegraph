@@ -60,8 +60,25 @@ export class Dashboard extends Component {
         super(props);
 
         this.state = {
+            isAuthorized: window.application.token !== null,
             isMinimized: false
         };
+    }
+
+    _update = () => {
+        if ((window.application.token !== null) !== this.state.isAuthorized) {
+            this.setState({
+                isAuthorized: window.application.token !== null
+            });
+        }
+    };
+
+    componentDidMount() {
+        window.application.addEventListener('update', this._update);
+    }
+
+    componentWillUnmount() {
+        window.application.addEventListener('update', this._update);
     }
 
     onToggleMinimize = () => {
@@ -71,11 +88,10 @@ export class Dashboard extends Component {
     };
 
     render() {
-        if (window.application.token === null) return <AnonymousDashboard/>;
-
-        const {isMinimized} = this.state;
-
+        const {isAuthorized, isMinimized} = this.state;
         const route = HistoryStore.getCurrentRoute();
+
+        if (!isAuthorized) return <AnonymousDashboard/>;
 
         let container;
         switch (route) {
@@ -105,6 +121,10 @@ export class Dashboard extends Component {
 }
 
 class DashboardHeader extends Component {
+    onLogout = () => {
+        window.application.token = null;
+    };
+
     onFullScreen = () => {
         if (window.document.body.classList.contains('fullscreen')) {
             let exitFullScreen = () =>
@@ -145,7 +165,7 @@ class DashboardHeader extends Component {
                     </div>
                     <div className="button-header">
                         <span>
-                            <a href={"javascript:void(0);"} title="sign out">
+                            <a href={"javascript:void(0);"} title="sign out" onClick={this.onLogout}>
                                 <i className="fa fa-sign-out-alt"/>
                             </a>
                         </span>

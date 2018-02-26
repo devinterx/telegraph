@@ -9,8 +9,12 @@ export default class ApplicationStore extends BaseStore {
     }
 
     set token(token) {
-        let date = new Date();
+        if (token === null) {
+            document.cookie = `token=;expires=Thu, 01 Jan 1970 00:00:01 GMT;path=/`;
+            return this._state.get().set({token});
+        }
 
+        let date = new Date();
         date.setTime(date.getTime() + (5 * 24 * 60 * 60 * 1000));
 
         document.cookie = `token=${token};expires=${date.toUTCString()};path=/`;

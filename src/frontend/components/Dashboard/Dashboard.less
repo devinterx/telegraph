@@ -615,14 +615,24 @@
 }
 
 .dashboard-container .main-content-container .ribbon .breadcrumb li:last-child,
-.dashboard-container .main-content-container .ribbon .breadcrumb > .active {
+.dashboard-container .main-content-container .ribbon .breadcrumb li > a.active {
   color: #E4E4E4;
+  cursor: default;
 }
 
 .dashboard-container .main-content-container .ribbon .breadcrumb > li + li:before {
   content: "/\00a0";
   padding: 0 5px;
   color: #ccc;
+}
+
+.dashboard-container .main-content-container .ribbon .breadcrumb li a > i {
+  margin-right: 5px;
+}
+
+.dashboard-container .main-content-container .dashboard-components-container {
+  position: relative;
+  padding: 10px 14px;
 }
 
 //.dashboard-container .top-menu-container {

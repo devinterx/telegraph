@@ -270,7 +270,8 @@ export default class User {
                         firstName: user.firstName,
                         lastName: user.lastName,
                         userName: user.userName,
-                        avatar: user.avatar || false
+                        avatar: user.avatar || false,
+                        isOnline: User._users[session.userId] !== undefined
                     });
                 } else {
                     response.status(409).json({error: 'User data in database incorrect'});

@@ -34,31 +34,43 @@ class TelegraphBot {
     _server;
 
     constructor(token, config) {
-        if (config.services.bot) this._bot = new TelegramBot(token, config.bot);
-        if (config.services.web) this._server = Express();
+        try {
+            let _config = Object.assign({}, config.bot, {
+                polling: {
+                    autoStart: false
+                }
+            });
+            if (config.services.bot) this._bot = new TelegramBot(token, _config);
+            if (config.services.web) this._server = Express();
 
-        Database.init(config.db, () => {
-            if (this._server) WebServer.init(this._server, Express);
-            if (this._bot) {
-                User.addResponseChannel(this._bot, token);
-            }
-            this._listen(config);
-        });
+            Database.init(config.db, () => {
+                if (this._server) WebServer.init(this._server, Express);
+                if (this._bot) {
+                    User.addResponseChannel(this._bot, token);
+                }
+                this._listen(config);
+            });
+        } catch (error) {
+            this.onError(error);
+        }
     }
 
     _listen = options => {
         if (this._bot) this._bot.on('message', this.onMessage);
         if (this._bot) this._bot.on('callback_query', this.onCallbackQuery);
         if (this._bot) this._bot.on('polling_error', this.onError);
+        if (this._bot) this._bot.on('webhook_error', this.onError);
 
         if (this._server) this._server.listen(
             options && options.web ? options.web.port || 8080 : 8080,
             options && options.ip ? options.web.ip || '0.0.0.0' : '0.0.0.0',
             this.onError);
 
+        if (this._bot) this._bot.startPolling().catch(this.onError);
+
         setInterval(TelegraphBot.gc, 3600000);
 
-        console.log(`Telegraph: i'am listen your dreams now. \r\n\tWeb interface: http://127.0.0.1:${
+        console.info(`Telegraph: i'am listen your dreams now. \r\n\tWeb interface: http://127.0.0.1:${
             options && options.web ? options.web.port || 8080 : 8080}.`
         );
     };
@@ -84,13 +96,14 @@ class TelegraphBot {
     };
 
     onError = error => {
-        if (error !== undefined) console.log(error);
+        if (error && error.message) console.log(error.message);
     };
 
     static gc = () => {
-        console.log(`Telegraph: start unloading inactive dreams.`);
+        console.info(`Telegraph: start unloading inactive dreams...`);
         User.unloadInactiveUsers();
         Scene.unloadInactiveScenes();
+        console.info(`Telegraph: end unloading inactive dreams.`);
     };
 }
 

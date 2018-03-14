@@ -25,9 +25,35 @@ export default class DashboardComponent extends Component {
 export class DashboardComponentHeader extends Component {
     render() {
         return (
-            <div className="dashboard-component-header">
-                ...Header panel
+            <header className="dashboard-component-header">
+                <span className="header-icon"><i className="fa fa-table"/></span>
+                <h2>{this.props.title || '...Header panel'}</h2>
                 <div className="button update" onClick={this.onUpdate}><i className="fa fa-refresh"/></div>
+            </header>
+        );
+    }
+}
+
+export class DashboardComponentFooter extends Component {
+    render() {
+        return (
+            <div className="dashboard-component-footer">
+                <div className="col-sm-6 col-xs-12 hidden-xs"/>
+                <div className="col-xs-12 col-sm-6">
+                    {this.props.children}
+                </div>
+            </div>
+        );
+    }
+}
+
+export class DashboardComponentContent extends Component {
+    render() {
+        return (
+            <div className="dashboard-component-content">
+                <div className="body">
+                    {this.props.children}
+                </div>
             </div>
         );
     }
@@ -45,18 +71,23 @@ export class DashboardComponentPaginator extends Component {
         }
 
         return (
-            <ul className="dashboard-component-paginator">
-                {pages.map(page => {
-                    return (
-                        <li className={`page${page === currentPage ? ' active' : ''}`} key={`page-${page}`}
-                            onClick={() => {
-                                if (page !== currentPage) onPageClick(limit * (page - 1));
-                            }}>
-                            {page}
-                        </li>
-                    );
-                })}
-            </ul>
+            <div className="dashboard-component-paginator">
+                <ul>
+                    <li className="button previous disabled"><span>Previous</span></li>
+                    {pages.map(page => {
+                        return (
+                            <li className={`button${page === currentPage ? ' active' : ''}`} key={`page-${page}`}
+                                onClick={() => {
+                                    if (page !== currentPage) onPageClick(limit * (page - 1));
+                                }}>
+                                <span>{page}</span>
+                            </li>
+                        );
+                    })}
+                    <li className="button disabled"><span>…</span></li>
+                    <li className="button next"><span>Next</span></li>
+                </ul>
+            </div>
         );
     }
 }

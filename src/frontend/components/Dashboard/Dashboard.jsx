@@ -2,6 +2,7 @@ import React, {Component} from "react";
 import HistoryStore, {ROUTE_TYPE} from "../../stores/History/History";
 import Users from "../Users/Users";
 import "./Dashboard.less"
+import Scenes from "../Scenes/Scenes";
 
 const SIDEBAR_MENU = [
     {
@@ -93,28 +94,38 @@ export class Dashboard extends Component {
 
         if (!isAuthorized) return <AnonymousDashboard/>;
 
-        let container;
+        let container, breadcrumb;
         switch (route) {
+            case '/scenes':
+                container = <Scenes/>;
+                breadcrumb = (
+                    <a className="active" href={`#${ROUTE_TYPE.ON_SCENES}`} title="scenes">
+                        <i className="fa fa-puzzle-piece"/><span>Scenes</span>
+                    </a>
+                );
+                break;
+
             case '/users':
                 container = <Users/>;
+                breadcrumb = (
+                    <a className="active" href={`#${ROUTE_TYPE.ON_USERS}`} title="users">
+                        <i className="fa fa-users"/><span>Users</span>
+                    </a>
+                );
                 break;
+
             default:
-                container = <div>{route}</div>
+                container = null; // <div>{route}</div>
+                breadcrumb = null;
         }
 
         return (
             <div className={`dashboard-container${isMinimized ? ' minimized' : ''}`}>
                 <DashboardHeader/>
                 <DashboardMenu onToggleMinimize={this.onToggleMinimize}/>
-                <div className="main-content-container" role="main">
-                    <div className="ribbon">
-                        <ol className="breadcrumb">
-                            <li>Home</li>
-                            <li>Dashboard</li>
-                        </ol>
-                    </div>
-                </div>
-                {/*{container}*/}
+                <DashboardMainContainer breadcrumb={breadcrumb}>
+                    {container}
+                </DashboardMainContainer>
             </div>
         )
     }
@@ -156,13 +167,6 @@ class DashboardHeader extends Component {
                     </div>
                 </div>
                 <div className="right-container">
-                    <div className="button-header">
-                        <span>
-                            <a href={"javascript:void(0);"} title="toggle menu">
-                                <i className="fa fa-bars"/>
-                            </a>
-                        </span>
-                    </div>
                     <div className="button-header">
                         <span>
                             <a href={"javascript:void(0);"} title="sign out" onClick={this.onLogout}>
@@ -280,6 +284,68 @@ class DashboardMenuItem extends Component {
                 ) : null}
             </li>
         ) : null
+    }
+}
+
+class DashboardBreadCrumbPanel extends Component {
+    constructor(props) {
+        super(props);
+
+        this.state = {
+            breadcrumb: props.breadcrumb
+        };
+    }
+
+    componentWillReceiveProps(props) {
+        if (this.state.breadcrumb !== props.breadcrumb) {
+            this.setState({
+                breadcrumb: props.breadcrumb
+            });
+        }
+    }
+
+    render() {
+        return (
+            <div className="ribbon">
+                <ol className="breadcrumb">
+                    <li><a className={(HistoryStore.getCurrentRoute() === ROUTE_TYPE.ON_HOME) ? 'active' : ''}
+                           href={`#${ROUTE_TYPE.ON_HOME}`}
+                    >
+                        <i className="fa fa-home"/><span>Home</span>
+                    </a></li>
+                    {this.state.breadcrumb ? <li>{this.state.breadcrumb}</li> : null}
+                </ol>
+            </div>
+        );
+    }
+}
+
+class DashboardMainContainer extends Component {
+    constructor(props) {
+        super(props);
+
+        this.state = {
+            breadcrumb: props.breadcrumb
+        };
+    }
+
+    componentWillReceiveProps(props) {
+        if (this.state.breadcrumb !== props.breadcrumb) {
+            this.setState({
+                breadcrumb: props.breadcrumb
+            });
+        }
+    }
+
+    render() {
+        return (
+            <div className="main-content-container" role="main">
+                <DashboardBreadCrumbPanel breadcrumb={this.state.breadcrumb}/>
+                <div className="dashboard-components-container">
+                     {this.props.children}
+                </div>
+            </div>
+        );
     }
 }
 

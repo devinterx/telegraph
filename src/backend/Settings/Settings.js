@@ -2,14 +2,14 @@ import Database from "../Database/Database";
 
 export default class Settings {
 
-    static set(setting, callback) {
-        Database.save('settings', {key: setting.key}, Object.assign({}, setting), setting => {
+    static set(key, value, callback) {
+        Database.save('settings', {key,value}, Object.assign({}, {key,value}), setting => {
             callback(setting);
         });
     }
 
     static get(key,callback) {
-        Database.find('settings', {key: key}, results => {
+        Database.find('settings', {key}, results => {
             callback(results);
         });
     }

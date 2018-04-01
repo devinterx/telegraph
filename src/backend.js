@@ -43,8 +43,8 @@ class TelegraphBot {
             if (this._bot) User.addResponseChannel(this._bot);
             this._listen(config);
 
-            Settings.set({key: 'test',value: 'kek'},() => {
-                Settings.get('test',results => {
+            Settings.set('setting_first','XYU',() => {
+                Settings.get('setting_first',results => {
                     console.log(results);
                 });
             });

@@ -42,12 +42,17 @@ class TelegraphBot {
             if (this._server) WebServer.init(this._server, Express);
             if (this._bot) User.addResponseChannel(this._bot);
             this._listen(config);
-
-            Settings.set('setting_first','XYU',() => {
-                Settings.get('setting_first',results => {
+            Settings.set('settings_first','lel',() => {
+                Settings.get('settings_first', results => {
                     console.log(results);
+                    Settings.remove('settings_first',() => {
+                        Settings.get('settings_first', results => {
+                            console.log(results);
+                        });
+                    });
                 });
             });
+
         });
     }
 

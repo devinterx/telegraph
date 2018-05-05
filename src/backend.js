@@ -1,7 +1,6 @@
 import TelegramBot from "node-telegram-bot-api"
 import Express from "express"
 
-import Settings from "./backend/Settings/Settings"
 import Database from "./backend/Database/Database"
 import User from "./backend/User/User"
 import Scene from "./backend/Scene/Scene"
@@ -42,17 +41,6 @@ class TelegraphBot {
             if (this._server) WebServer.init(this._server, Express);
             if (this._bot) User.addResponseChannel(this._bot);
             this._listen(config);
-            Settings.set('settings_first','lel',() => {
-                Settings.get('settings_first', results => {
-                    console.log(results);
-                    Settings.remove('settings_first',() => {
-                        Settings.get('settings_first', results => {
-                            console.log(results);
-                        });
-                    });
-                });
-            });
-
         });
     }
 

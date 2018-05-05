@@ -63,7 +63,7 @@ class MongoDatabase {
             this._db = client.db(config.db);
             callback();
         }).catch(error => {
-            console.log(`DB: error:`, error);
+            console.log(`DB: error:`, error.message);
         });
     }
 

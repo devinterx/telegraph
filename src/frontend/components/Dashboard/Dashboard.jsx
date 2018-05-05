@@ -189,17 +189,23 @@ class DashboardHeader extends Component {
 
 class DashboardMenu extends Component {
     render() {
+        let userInfo = (
+            <span>
+                <a href="javascript:void(0);">
+                    <img src="" alt="me"/>
+                    <span>
+                        john.doe
+                    </span>
+                </a>
+            </span>
+        );
+
+        userInfo = null;
+
         return (
             <aside className="dashboard-menu">
                 <div className="user-info">
-                    <span>
-                        <a href="javascript:void(0);">
-                            <img src="" alt="me"/>
-                            <span>
-                                john.doe
-                            </span>
-                        </a>
-                    </span>
+                    {userInfo}
                 </div>
                 <nav>
                     <ul>
@@ -342,7 +348,7 @@ class DashboardMainContainer extends Component {
             <div className="main-content-container" role="main">
                 <DashboardBreadCrumbPanel breadcrumb={this.state.breadcrumb}/>
                 <div className="dashboard-components-container">
-                     {this.props.children}
+                    {this.props.children}
                 </div>
             </div>
         );

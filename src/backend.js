@@ -4,6 +4,8 @@ import Express from "express"
 import Database from "./backend/Database/Database"
 import User from "./backend/User/User"
 import Scene from "./backend/Scene/Scene"
+import Settings from "./backend/Settings/Settings"
+import Token from "./backend/Token/Token";
 import WebServer from "./backend/Web/WebServer"
 
 import fs from "fs"
@@ -24,7 +26,8 @@ const TOKEN = '';
  *  }},
  *  services:{web:boolean, bot:boolean},
  *  web:{host:string, ip:string, port:int},
- *  bot:{polling:boolean}
+ *  bot:{polling:boolean},
+ *  installation:{key:string}
  * }}
  */
 const CONFIG_FILE = path.resolve('./config.json');
@@ -32,6 +35,7 @@ const CONFIG_FILE = path.resolve('./config.json');
 class TelegraphBot {
     _bot;
     _server;
+    _installation_key;
 
     constructor(token, config) {
         if (config.services.bot) this._bot = new TelegramBot(token, config.bot);
@@ -59,6 +63,19 @@ class TelegraphBot {
         console.log(`Victoriano: i'am listen your dreams now. \r\n\tWeb interface: http://127.0.0.1:${
             options && options.web ? options.web.port || 8080 : 8080}.`
         );
+
+        Settings.get('installing_complete', result => {
+            if(result === null) {
+                if (typeof options.installation.key === 'string' && options.installation.key !== '') {
+                    this._installation_key = options.installation.key;
+                    console.log(`To complete the installation, send to bot message with the installation code you specified in the configuration.`);
+                }
+                else {
+                    this._installation_key = new Token().toString();
+                    console.log(`To complete the installation, send to bot message with the installation code which was generated as that you have not added in the config: ${this._installation_key}`);
+                }
+            }
+        })
     };
 
     onMessage = context => {

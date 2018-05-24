@@ -20,5 +20,8 @@
   },
   "bot": {
     "polling": true
+  },
+  "installation": {
+	"key": ""
   }
 }

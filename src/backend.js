@@ -2,6 +2,7 @@ import TelegramBot from "node-telegram-bot-api"
 import Express from "express"
 
 import Database from "./backend/Database/Database"
+import Auth from "./backend/Auth/Auth"
 import User from "./backend/User/User"
 import Scene from "./backend/Scene/Scene"
 import Settings from "./backend/Settings/Settings"
@@ -75,18 +76,33 @@ class TelegraphBot {
                     console.log(`To complete the installation, send to bot message with the installation code which was generated as that you have not added in the config: ${this._installation_key}`);
                 }
             }
-        })
+        });
     };
 
     onMessage = context => {
         if (context.from['is_bot'] === true) return;
 
         User.loadUser(context.from, user => {
-            if (context.text.startsWith('/')) {
-                user.onCommand(context.text);
-            } else {
-                user.onMessage(context.text.toString());
-            }
+            Settings.get('installing_complete', result => {
+                if(result === null) {
+                    if(context.text.toString() === this._installation_key) {
+                        Settings.set('installing_complete','true',() => {
+                            user.data.permission = Auth.PERMISSION.ADMINISTRATOR;
+                            user.saveUser(() => {
+                                user.sendMessage(`Installation complete! You been administrator!`);
+                            });
+                        });
+                    } else {
+                        user.sendMessage(`To complete the bot configuration, enter the installation key!`);
+                    }
+                } else {
+                    if (context.text.startsWith('/')) {
+                        user.onCommand(context.text);
+                    } else {
+                        user.onMessage(context.text.toString());
+                    }
+                }
+            });
         });
     };
 

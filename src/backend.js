@@ -2,12 +2,12 @@ import TelegramBot from "node-telegram-bot-api"
 import Express from "express"
 
 import Database from "./backend/Database/Database"
-import Auth from "./backend/Auth/Auth"
 import User from "./backend/User/User"
 import Scene from "./backend/Scene/Scene"
 import Settings from "./backend/Settings/Settings"
 import Token from "./backend/Token/Token";
 import WebServer from "./backend/Web/WebServer"
+import {PERMISSION} from "./backend/Auth/Auth";
 
 import fs from "fs"
 import path from "path"
@@ -87,7 +87,7 @@ class TelegraphBot {
                 if(result === null) {
                     if(context.text.toString() === this._installation_key) {
                         Settings.set('installing_complete','true',() => {
-                            user.data.permission = Auth.PERMISSION.ADMINISTRATOR;
+                            user.data.permission = PERMISSION.ADMINISTRATOR;
                             user.saveUser(() => {
                                 user.sendMessage(`Installation complete! You been administrator!`);
                             });

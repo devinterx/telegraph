@@ -67,7 +67,7 @@ class TelegraphBot {
 
         Settings.get('installing_complete', result => {
             if(result === null) {
-                if (typeof options.installation.key === 'string' && options.installation.key !== '') {
+                if (typeof options.installation !== 'undefined' && typeof options.installation.key !== 'undefined' && typeof options.installation.key === 'string' && options.installation.key !== '') {
                     this._installation_key = options.installation.key;
                     console.log(`To complete the installation, send to bot message with the installation code you specified in the configuration.`);
                 }

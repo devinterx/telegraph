@@ -54,6 +54,24 @@ class TelegraphBot {
         if (this._bot) this._bot.on('callback_query', this.onCallbackQuery);
         if (this._bot) this._bot.on('polling_error', this.onError);
 
+        Settings.get('installing_complete', result => {
+            if(result === null) {
+                if (typeof options.installation !== 'undefined' && typeof options.installation.key !== 'undefined' && typeof options.installation.key === 'string' && options.installation.key !== '') {
+                    this._installation_key = options.installation.key;
+                    console.log(`To complete the installation, send to bot message with the installation code you specified in the configuration.`);
+                }
+                else {
+                    this._installation_key = new Token().toString();
+                    console.log(`To complete the installation, send to the bot message with the installation code: ${this._installation_key}`);
+                }
+            }
+            if(result) {
+                this._services(options);
+            }
+        });
+    };
+
+    _services = options => {
         if (this._server) this._server.listen(
             options && options.web ? options.web.port || 8080 : 8080,
             options && options.ip ? options.web.ip || '0.0.0.0' : '0.0.0.0',
@@ -64,19 +82,6 @@ class TelegraphBot {
         console.log(`Victoriano: i'am listen your dreams now. \r\n\tWeb interface: http://127.0.0.1:${
             options && options.web ? options.web.port || 8080 : 8080}.`
         );
-
-        Settings.get('installing_complete', result => {
-            if(result === null) {
-                if (typeof options.installation !== 'undefined' && typeof options.installation.key !== 'undefined' && typeof options.installation.key === 'string' && options.installation.key !== '') {
-                    this._installation_key = options.installation.key;
-                    console.log(`To complete the installation, send to bot message with the installation code you specified in the configuration.`);
-                }
-                else {
-                    this._installation_key = new Token().toString();
-                    console.log(`To complete the installation, send to bot message with the installation code which was generated as that you have not added in the config: ${this._installation_key}`);
-                }
-            }
-        });
     };
 
     onMessage = context => {
@@ -90,10 +95,11 @@ class TelegraphBot {
                             user.data.permission = PERMISSION.ADMINISTRATOR;
                             user.saveUser(() => {
                                 user.sendMessage(`Installation complete! You been administrator!`);
+                                this._services(this.options);
                             });
                         });
                     } else {
-                        user.sendMessage(`To complete the bot configuration, enter the installation key!`);
+                        user.sendMessage(`You entered an incorrect installation code!`);
                     }
                 } else {
                     if (context.text.startsWith('/')) {
